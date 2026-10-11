@@ -1,0 +1,39 @@
+symbols: [BTCUSDT, ETHUSDT]
+decision_interval: 4h
+history_start: "2016-01-01"
+
+features:
+  groups:
+    price: true
+    derivatives: true
+    liquidations: false   # keep off unless same-data CV and backtest show an improvement
+    onchain: false        # needs Glassnode / CryptoQuant key
+  onchain_publication_lag_hours: 24
+
+labeling:
+  horizon_candles: 6      # 6 x 4h = 24h
+  flat_atr_mult: 1.0      # |fwd return| below k * atr_pct * sqrt(horizon) => flat
+
+model:
+  confidence_threshold: 0.75
+  class_balance: false    # `trader-bot experiment` compares balanced vs unweighted classifiers
+  embargo_candles: 6
+  cv_splits: 5
+  min_train_candles: 1500
+  retrain_every_candles: 540   # backtest walk-forward / live weekly-ish
+  optuna_trials: 30
+
+risk:                       # values are clamped to hard maximums in risk/limits.py
+  risk_per_trade: 0.01
+  leverage: 3
+  atr_stop_mult: 2.0
+  min_reward_risk: 1.5
+  max_open_positions: 2
+  daily_loss_limit: 0.03
+  weekly_loss_limit: 0.07
+
+backtest:
+  taker_fee: 0.0005
+  slippage_bps: 2.0
+  initial_equity: 10000
+  start: "2023-10-01"      # ~3 years of out-of-sample trading

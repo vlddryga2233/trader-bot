@@ -1,0 +1,45 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: trader
+      POSTGRES_DB: trader
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - tsdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader -d trader"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  collector:
+    build: .
+    command: ["trader-bot", "collect"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://trader:trader@timescaledb:5432/trader
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  bot:
+    build: .
+    command: ["trader-bot", "run"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://trader:trader@timescaledb:5432/trader
+    volumes:
+      - ./state:/app/state
+      - ./artifacts:/app/artifacts
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    profiles: ["bot"]   # start explicitly: docker compose --profile bot up bot
+    restart: "no"       # never auto-restart after a kill switch
+
+volumes:
+  tsdata:

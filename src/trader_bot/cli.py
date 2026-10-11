@@ -1,0 +1,231 @@
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+from pathlib import Path
+from datetime import UTC, date, datetime
+
+import structlog
+import typer
+
+from trader_bot.config.settings import Settings, load_strategy
+
+app = typer.Typer(no_args_is_help=True, add_completion=False)
+
+
+def _ctx():
+    settings = Settings()
+    cfg = load_strategy(settings.strategy_config)
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.INFO))
+    from trader_bot.db.store import make_engine
+
+    return settings, cfg, make_engine(settings.database_url)
+
+
+@app.command("init-db")
+def init_db_cmd() -> None:
+    """Create tables and Timescale hypertables."""
+    from trader_bot.db.schema import init_db
+
+    _, _, engine = _ctx()
+    init_db(engine)
+    typer.echo("database initialised")
+
+
+@app.command()
+def backfill() -> None:
+    """Download history (klines, funding, derivatives metrics) for all symbols."""
+    from trader_bot.data.ingest.backfill import backfill_symbol, report_gaps
+
+    _, cfg, engine = _ctx()
+    for s in cfg.symbols:
+        backfill_symbol(engine, s, cfg.history_start)
+        gaps = {k: len(v) for k, v in report_gaps(engine, s).items()}
+        typer.echo(f"{s} gaps: {gaps}")
+
+
+@app.command("backfill-liquidations")
+def backfill_liquidations_cmd(
+    start: str = typer.Option(..., help="First event date to load (YYYY-MM-DD)"),
+    end: str = typer.Option(..., help="Last event date to load (YYYY-MM-DD)"),
+) -> None:
+    """Download historical Binance liquidation aggregates from API BRICKS."""
+    from trader_bot.data.ingest.backfill import backfill_liquidations
+
+    settings, cfg, engine = _ctx()
+    try:
+        start_date = date.fromisoformat(start)
+        end_date = date.fromisoformat(end)
+    except ValueError as exc:
+        raise typer.BadParameter("dates must use YYYY-MM-DD format") from exc
+    if start_date > end_date:
+        raise typer.BadParameter("start must not be after end")
+    key = settings.api_briks_api_key.get_secret_value()
+    try:
+        count = backfill_liquidations(
+            engine,
+            cfg.symbols,
+            start_date,
+            end_date,
+            key,
+        )
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(f"loaded {count} aggregate liquidation rows from API BRICKS")
+
+
+@app.command()
+def collect() -> None:
+    """Run live collectors (closed klines, liquidations, metrics polling)."""
+    from trader_bot.data.ingest.live import run_collectors
+
+    _, cfg, engine = _ctx()
+    asyncio.run(run_collectors(engine, cfg.symbols))
+
+
+@app.command()
+def train(
+    tune_params: bool = typer.Option(False, "--tune", help="Run Optuna first"),
+    no_promote: bool = typer.Option(
+        False, "--no-promote", help="Save trained candidates without changing active models"
+    ),
+) -> None:
+    """Train + cross-validate models and promote them if not worse than the current ones."""
+    from trader_bot.models.registry import ModelRegistry
+    from trader_bot.models.retrain import retrain_symbol
+
+    settings, cfg, engine = _ctx()
+    reg = ModelRegistry(settings.artifacts_dir)
+    for s in cfg.symbols:
+        result = retrain_symbol(
+            engine, cfg, reg, s, tune_params, promote_model=not no_promote
+        )
+        typer.echo(json.dumps({s: result}, indent=2))
+
+
+@app.command()
+def experiment(
+    flat_atr_mults: str = typer.Option(
+        "0.5,1.0,1.5", help="Comma-separated flat-label ATR multipliers to compare"
+    ),
+) -> None:
+    """Compare flat-label bands and balanced classifiers with purged walk-forward CV."""
+    from trader_bot.models.experiments import compare_label_and_weight_variants
+
+    _, cfg, engine = _ctx()
+    try:
+        multipliers = [float(value.strip()) for value in flat_atr_mults.split(",")]
+    except ValueError as exc:
+        raise typer.BadParameter("use comma-separated positive numbers") from exc
+    out = Path("artifacts/experiments") / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    report = compare_label_and_weight_variants(engine, cfg, out, multipliers)
+    summary = {
+        symbol: [
+            {
+                "flat_atr_mult": item["flat_atr_mult"],
+                "class_balance": item["class_balance"],
+                "balanced_accuracy": item["metrics"]["balanced_accuracy"],
+                "directional_hc_coverage": item["metrics"]["directional_hc_coverage"],
+                "directional_hc_precision": item["metrics"]["directional_hc_precision"],
+                "oos_class_counts": item["metrics"]["oos_class_counts"],
+                "oos_predicted_class_counts": item["metrics"]["oos_predicted_class_counts"],
+            }
+            for item in results
+        ]
+        for symbol, results in report["symbols"].items()
+    }
+    typer.echo(json.dumps({"report": str(out / "report.json"), "summary": summary}, indent=2))
+
+
+@app.command()
+def backtest(
+    out: Path | None = None,
+    flat_atr_mult: float | None = typer.Option(None, help="Override the flat-label ATR multiplier"),
+    min_reward_risk: float | None = typer.Option(None, help="Override the risk engine reward/risk floor"),
+    balance_classes: bool = typer.Option(False, help="Use balanced classifier weights for this run"),
+) -> None:
+    """Walk-forward out-of-sample backtest; prints metrics and the Sharpe/MaxDD gate result."""
+    from trader_bot.backtest.run import run_backtest
+
+    _, cfg, engine = _ctx()
+    if flat_atr_mult is not None:
+        if flat_atr_mult <= 0:
+            raise typer.BadParameter("must be greater than zero")
+        cfg.labeling = cfg.labeling.model_copy(update={"flat_atr_mult": flat_atr_mult})
+    if min_reward_risk is not None:
+        if min_reward_risk <= 0:
+            raise typer.BadParameter("must be greater than zero")
+        cfg.risk = cfg.risk.model_copy(update={"min_reward_risk": min_reward_risk})
+    if balance_classes:
+        cfg.model = cfg.model.model_copy(update={"class_balance": True})
+    if out is None:
+        out = Path("artifacts/backtest")
+        if flat_atr_mult is not None or min_reward_risk is not None:
+            band = f"_band{flat_atr_mult:g}" if flat_atr_mult is not None else ""
+            rr = f"_rr{min_reward_risk:g}" if min_reward_risk is not None else ""
+            weighted = "_balanced" if balance_classes else ""
+            out = Path(f"artifacts/backtest{band}{rr}{weighted}")
+    typer.echo(json.dumps(run_backtest(engine, cfg, out), indent=2, default=str))
+
+
+@app.command("signal-study")
+def signal_study(
+    holdout_start: str = typer.Option("2025-10-01", help="First date reserved for final holdout"),
+    out: Path | None = typer.Option(None, help="Output directory for the study report"),
+) -> None:
+    """Inspect class/probability balance, tune thresholds on validation, score final holdout."""
+    from trader_bot.models.signal_study import run_signal_study
+
+    _, cfg, engine = _ctx()
+    try:
+        holdout = datetime.fromisoformat(holdout_start)
+        if holdout.tzinfo is None:
+            holdout = holdout.replace(tzinfo=UTC)
+    except ValueError as exc:
+        raise typer.BadParameter("holdout_start must be a date or timestamp") from exc
+    if out is None:
+        out = Path("artifacts/experiments") / datetime.now(UTC).strftime(
+            "signal-study-%Y%m%dT%H%M%SZ"
+        )
+    report = run_signal_study(engine, cfg, holdout, out)
+    summary = {
+        "report": str(out / "report.json"),
+        "selected_parameters": report["selected_parameters"],
+        "final_holdout": report["final_holdout"],
+    }
+    typer.echo(json.dumps(summary, indent=2, default=str))
+
+
+@app.command()
+def run(testnet: bool = typer.Option(True, "--testnet/--live")) -> None:
+    """Start the trading loop. Only --testnet is supported in this phase."""
+    from trader_bot.execution.client import BinanceSdkClient
+    from trader_bot.scheduler.runner import run_live
+
+    settings, cfg, engine = _ctx()
+    if not testnet or not settings.binance_testnet:
+        typer.echo("Live trading is out of scope (Stage 5): set BINANCE_TESTNET=true and use --testnet", err=True)
+        raise typer.Exit(2)
+    if not settings.binance_api_key.get_secret_value():
+        typer.echo("BINANCE_API_KEY / BINANCE_API_SECRET missing in .env", err=True)
+        raise typer.Exit(2)
+    client = BinanceSdkClient(settings.binance_api_key.get_secret_value(),
+                              settings.binance_api_secret.get_secret_value(), testnet=True)
+    asyncio.run(run_live(cfg, settings, engine, client))
+
+
+@app.command("killswitch-reset")
+def killswitch_reset() -> None:
+    """Manually clear the kill-switch lock after reviewing what happened."""
+    from trader_bot.risk.kill_switch import KillSwitch
+
+    settings, cfg, _ = _ctx()
+    ks = KillSwitch(settings.state_dir, cfg.risk.daily_loss_limit, cfg.risk.weekly_loss_limit)
+    info = ks.lock_info()
+    ks.reset()
+    typer.echo(f"kill switch cleared (was: {info})")
+
+
+if __name__ == "__main__":
+    app()
