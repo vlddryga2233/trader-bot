@@ -72,7 +72,8 @@ def cv_evaluate_pooled(datasets: dict[str, BarrierDataset], cfg: StrategyConfig)
         start=1,
     ):
         model = BarrierModel(ds.columns, purge=(h + m.embargo_candles) * k,
-                             calib_frac=cfg.barrier.calib_frac).fit(
+                             calib_frac=cfg.barrier.calib_frac,
+                             size=cfg.barrier.model_size).fit(
             X.iloc[tr], ds.y_long.iloc[tr], ds.y_short.iloc[tr]
         )
         P = model.predict(X.iloc[te])

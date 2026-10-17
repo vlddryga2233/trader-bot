@@ -20,6 +20,10 @@ from trader_bot.risk.engine import round_trip_cost
 
 BARRIER_PRED_COLS = ["p_long_win", "p_short_win", "p_long_raw", "p_short_raw"]
 MIN_CALIBRATION_ROWS = 200
+SMALL_PARAMS = {
+    "lgbm": {"num_leaves": 15, "min_child_samples": 100, "n_estimators": 300},
+    "catboost": {"depth": 4, "l2_leaf_reg": 5.0},
+}
 
 
 @dataclass
@@ -46,10 +50,12 @@ def build_barrier_dataset(feats: pd.DataFrame, cfg: StrategyConfig) -> BarrierDa
                           has, model_columns(valid))
 
 
-def _binary_models(seed: int) -> list:
+def _binary_models(seed: int, size: str = "default") -> list:
+    params = {key: {**value, **(SMALL_PARAMS[key] if size == "small" else {})}
+              for key, value in DEFAULT_PARAMS.items()}
     return [
-        LGBMClassifier(**DEFAULT_PARAMS["lgbm"], random_state=seed, verbose=-1),
-        CatBoostClassifier(**DEFAULT_PARAMS["catboost"], loss_function="Logloss",
+        LGBMClassifier(**params["lgbm"], random_state=seed, verbose=-1),
+        CatBoostClassifier(**params["catboost"], loss_function="Logloss",
                            random_seed=seed, verbose=0),
     ]
 
@@ -57,11 +63,13 @@ def _binary_models(seed: int) -> list:
 class BarrierModel:
     """Per side: LightGBM + CatBoost averaged, then isotonic calibration on a purged tail."""
 
-    def __init__(self, columns: list[str], purge: int, calib_frac: float = 0.2, seed: int = 42):
+    def __init__(self, columns: list[str], purge: int, calib_frac: float = 0.2, seed: int = 42,
+                 size: str = "default"):
         self.columns = columns
         self.purge = purge
         self.calib_frac = calib_frac
         self.seed = seed
+        self.size = size
         self.models: dict[str, list] = {}
         self.calibrators: dict[str, IsotonicRegression | None] = {}
 
@@ -81,7 +89,7 @@ class BarrierModel:
             y_int = y.astype(int)
             if y_int.iloc[:fit_end].nunique() < 2:
                 raise ValueError(f"{side} labels contain a single class")
-            self.models[side] = _binary_models(self.seed)
+            self.models[side] = _binary_models(self.seed, self.size)
             for model in self.models[side]:
                 model.fit(Xc.iloc[:fit_end], y_int.iloc[:fit_end])
             if use_calibration:
@@ -195,7 +203,8 @@ def cv_evaluate_barrier(ds: BarrierDataset, cfg: StrategyConfig) -> dict:
         start=1,
     ):
         model = BarrierModel(ds.columns, purge=h + m.embargo_candles,
-                             calib_frac=cfg.barrier.calib_frac).fit(
+                             calib_frac=cfg.barrier.calib_frac,
+                             size=cfg.barrier.model_size).fit(
             X.iloc[tr], yl.iloc[tr], ys.iloc[tr]
         )
         prediction = model.predict(X.iloc[te])
@@ -242,7 +251,8 @@ def walk_forward_barrier_predictions(ds: BarrierDataset, cfg: StrategyConfig,
         if len(idx) < m.min_train_candles // 2:
             continue
         model = BarrierModel(ds.columns, purge=h + m.embargo_candles,
-                             calib_frac=cfg.barrier.calib_frac).fit(
+                             calib_frac=cfg.barrier.calib_frac,
+                             size=cfg.barrier.model_size).fit(
             ds.X.iloc[idx], ds.y_long.iloc[idx], ds.y_short.iloc[idx]
         )
         out.append(model.predict(ds.X.iloc[s:e]))

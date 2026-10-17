@@ -86,6 +86,7 @@ class BarrierCfg(BaseModel):
     calib_frac: float = Field(default=0.2, gt=0, lt=0.5)
     promotion_min_signals: int = Field(default=30, ge=1)
     promotion_min_mean_r: float = 0.05
+    model_size: Literal["default", "small"] = "default"
 
 
 class BacktestCfg(BaseModel):

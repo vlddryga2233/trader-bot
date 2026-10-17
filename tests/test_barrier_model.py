@@ -84,3 +84,10 @@ def test_cv_evaluate_pooled_reports_each_symbol():
                               "ETHUSDT": _synthetic(n=800, seed=2)}, cfg)
     assert set(out) == {"BTCUSDT", "ETHUSDT"}
     assert out["BTCUSDT"]["auc_long"] > 0.6
+
+
+def test_small_model_option_fits():
+    ds = _synthetic()
+    model = BarrierModel(ds.columns, purge=12, calib_frac=0.3, size="small").fit(
+        ds.X, ds.y_long, ds.y_short)
+    assert model.models["long"][0].get_params()["num_leaves"] == 15

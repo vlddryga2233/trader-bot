@@ -51,3 +51,4 @@ barrier:
   calib_frac: 0.2           # most recent share of each training window used for calibration
   promotion_min_signals: 30
   promotion_min_mean_r: 0.05
+  model_size: default   # or "small"
