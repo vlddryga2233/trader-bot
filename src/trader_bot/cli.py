@@ -144,11 +144,14 @@ def backtest(
     flat_atr_mult: float | None = typer.Option(None, help="Override the flat-label ATR multiplier"),
     min_reward_risk: float | None = typer.Option(None, help="Override the risk engine reward/risk floor"),
     balance_classes: bool = typer.Option(False, help="Use balanced classifier weights for this run"),
+    registry_params: bool = typer.Option(
+        False, "--registry-params", help="Use hyperparameters saved with promoted models"
+    ),
 ) -> None:
     """Walk-forward out-of-sample backtest; prints metrics and the Sharpe/MaxDD gate result."""
     from trader_bot.backtest.run import run_backtest
 
-    _, cfg, engine = _ctx()
+    settings, cfg, engine = _ctx()
     if flat_atr_mult is not None:
         if flat_atr_mult <= 0:
             raise typer.BadParameter("must be greater than zero")
@@ -166,7 +169,13 @@ def backtest(
             rr = f"_rr{min_reward_risk:g}" if min_reward_risk is not None else ""
             weighted = "_balanced" if balance_classes else ""
             out = Path(f"artifacts/backtest{band}{rr}{weighted}")
-    typer.echo(json.dumps(run_backtest(engine, cfg, out), indent=2, default=str))
+    params_by_symbol = None
+    if registry_params:
+        from trader_bot.models.registry import ModelRegistry
+
+        reg = ModelRegistry(settings.artifacts_dir)
+        params_by_symbol = {symbol: reg.current_params(symbol) for symbol in cfg.symbols}
+    typer.echo(json.dumps(run_backtest(engine, cfg, out, params_by_symbol), indent=2, default=str))
 
 
 @app.command("signal-study")
@@ -194,6 +203,87 @@ def signal_study(
         "selected_parameters": report["selected_parameters"],
         "final_holdout": report["final_holdout"],
     }
+    typer.echo(json.dumps(summary, indent=2, default=str))
+
+
+def _parse_utc(value: str, name: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise typer.BadParameter(f"{name} must be a date or timestamp") from exc
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
+@app.command("barrier-experiment")
+def barrier_experiment(
+    holdout_start: str = typer.Option("2025-10-01", help="Rows from this date are excluded"),
+    tp_atr_mults: str = typer.Option("2.0,3.0,4.0", help="Comma-separated take-profit ATR mults"),
+    horizons: str = typer.Option("3,6,12", help="Comma-separated horizons in candles"),
+) -> None:
+    """Purged-CV grid for barrier labels + EV rule, using only pre-holdout data."""
+    import pandas as pd
+
+    from trader_bot.models.barrier_experiment import SUMMARY_KEYS, run_barrier_experiment
+
+    _, cfg, engine = _ctx()
+    try:
+        tps = [float(value) for value in tp_atr_mults.split(",")]
+        hs = [int(value) for value in horizons.split(",")]
+    except ValueError as exc:
+        raise typer.BadParameter("use comma-separated numbers") from exc
+    if any(value <= 0 for value in tps) or any(value <= 0 for value in hs):
+        raise typer.BadParameter("values must be positive")
+    holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start"))
+    out = Path("artifacts/experiments") / datetime.now(UTC).strftime("barrier-%Y%m%dT%H%M%SZ")
+    report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs)
+    summary = {
+        symbol: [{"horizon_candles": item["horizon_candles"],
+                  "tp_atr_mult": item["tp_atr_mult"],
+                  **{key: item["metrics"][key] for key in SUMMARY_KEYS}}
+                 for item in results]
+        for symbol, results in report["symbols"].items()
+    }
+    typer.echo(json.dumps({"report": str(out / "report.json"), "summary": summary},
+                          indent=2, default=str))
+
+
+@app.command("barrier-backtest")
+def barrier_backtest(
+    holdout_start: str | None = typer.Option(None, help="Split report into validation/holdout"),
+    out: Path | None = typer.Option(None, help="Output directory"),  # noqa: B008
+) -> None:
+    """Walk-forward backtest with barrier labels and the expected-value signal rule."""
+    import pandas as pd
+
+    from trader_bot.backtest.run_barrier import run_barrier_backtest
+
+    _, cfg, engine = _ctx()
+    if cfg.barrier.tp_atr_mult / cfg.risk.atr_stop_mult < cfg.risk.min_reward_risk:
+        raise typer.BadParameter("barrier.tp_atr_mult / atr_stop_mult is below min_reward_risk")
+    holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start")) if holdout_start else None
+    out = out or Path("artifacts/backtest_barrier")
+    report = run_barrier_backtest(engine, cfg, out, holdout)
+    typer.echo(json.dumps({"report": str(out / "report.json"),
+                           "segments": {key: value["portfolio"]
+                                        for key, value in report["segments"].items()}},
+                          indent=2, default=str))
+
+
+@app.command()
+def baselines(
+    holdout_start: str | None = typer.Option(None, help="Split report into validation/holdout"),
+    out: Path = typer.Option(Path("artifacts/baselines"), help="Output directory"),  # noqa: B008
+) -> None:
+    """Rule-based baselines using the same simulator, sizing, and costs as the ML backtest."""
+    import pandas as pd
+
+    from trader_bot.backtest.baselines import run_baselines
+
+    _, cfg, engine = _ctx()
+    holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start")) if holdout_start else None
+    report = run_baselines(engine, cfg, out, holdout)
+    summary = {name: {segment: result["portfolio"] for segment, result in segments.items()}
+               for name, segments in report["baselines"].items()}
     typer.echo(json.dumps(summary, indent=2, default=str))
 
 

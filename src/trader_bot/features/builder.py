@@ -107,6 +107,8 @@ def price_features(k4: pd.DataFrame, k1: pd.DataFrame, kd: pd.DataFrame) -> pd.D
     p["taker_buy_ratio"] = k4["taker_buy_base"] / v.replace(0, np.nan)
     p[f"{CTX_PREFIX}close"] = c
     p[f"{CTX_PREFIX}atr"] = atr
+    p[f"{CTX_PREFIX}high"] = k4["high"]
+    p[f"{CTX_PREFIX}low"] = k4["low"]
     p = _stamp_closed(p, PRIMARY)
 
     if not k1.empty:

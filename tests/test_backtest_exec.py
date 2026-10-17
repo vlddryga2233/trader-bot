@@ -38,6 +38,31 @@ def test_take_profit_hit_pnl_matches_risk_math():
     assert equity.iloc[-1] == pytest.approx(10_250.0)
 
 
+def test_take_profit_exit_pays_slippage():
+    bars = _bars([[100, 101, 99.5, 100], [100, 106, 99.5, 105], [105, 105, 104, 105]])
+    preds, atr = _long_pred(bars)
+    funding = pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
+    bt = BacktestCfg(taker_fee=0.0, slippage_bps=10.0, initial_equity=10_000)
+    _, trades = simulate(bars, preds, atr, funding, RISK, bt, 0.75, horizon=6,
+                         initial_equity=10_000)
+    assert trades.iloc[0]["reason"] == "take_profit"
+    assert trades.iloc[0]["exit"] < 105.0
+
+
+def test_simulate_accepts_custom_signal_fn():
+    from trader_bot.risk.engine import Signal
+
+    bars = _bars([[100, 101, 99.5, 100], [100, 106, 99.5, 105], [105, 105, 104, 105]])
+    t = bars.index[0]
+    preds = pd.DataFrame({"p_long_win": [0.9], "p_short_win": [0.1]}, index=[t])
+    atr = pd.Series([1.0], index=[t])
+    funding = pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
+    _, trades = simulate(bars, preds, atr, funding, RISK, BT, 0.0, horizon=6,
+                         initial_equity=10_000,
+                         signal_fn=lambda row, price, a: Signal(1, 0.9, 0.05))
+    assert len(trades) == 1 and trades.iloc[0]["pnl"] == pytest.approx(250.0)
+
+
 def test_stop_wins_when_stop_and_target_in_same_bar():
     bars = _bars([[100, 106, 97, 100], [100, 100, 100, 100]])
     _, trades = _run(bars)
@@ -88,6 +113,17 @@ def test_metrics_and_gate():
     assert passes_gate({"sharpe": 2.0, "max_drawdown": -0.1})
     assert not passes_gate({"sharpe": 2.0, "max_drawdown": -0.2})
     assert not passes_gate({"sharpe": 1.0, "max_drawdown": -0.05})
+
+
+def test_bootstrap_sharpe_ci_brackets_point_estimate():
+    from trader_bot.backtest.metrics import bootstrap_sharpe_ci
+
+    rng = np.random.default_rng(1)
+    idx = pd.date_range("2024-01-01", periods=400, freq="1D", tz="UTC")
+    equity = pd.Series(10_000 * np.cumprod(1 + rng.normal(0.001, 0.01, 400)), index=idx)
+    low, high = bootstrap_sharpe_ci(equity)
+    point = compute_metrics(equity, pd.DataFrame(columns=["pnl"]))["sharpe"]
+    assert low < point < high
 
 
 def test_exchange_filters():

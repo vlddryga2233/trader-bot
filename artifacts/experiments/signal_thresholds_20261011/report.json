@@ -1,0 +1,2551 @@
+{
+  "method": {
+    "validation_start": "2023-10-01 00:00:00+00:00",
+    "validation_end_exclusive": "2025-10-01 00:00:00+00:00",
+    "holdout_start": "2025-10-01 00:00:00+00:00",
+    "holdout_end_exclusive": "2026-10-05 04:00:00+00:00",
+    "holdout_predictions_are_walk_forward": true,
+    "validation_label_purge": "label_end must be before holdout_start",
+    "confidence_grid": [
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.75
+    ],
+    "min_reward_risk_grid": [
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5
+    ],
+    "selection_rule": "maximize validation Sharpe with at least 20 trades and max drawdown <= 15%; otherwise exploratory"
+  },
+  "class_and_probability_diagnostics": {
+    "BTCUSDT": {
+      "pre_holdout_label_balance": {
+        "short": {
+          "count": 874,
+          "fraction": 0.06602704540303694
+        },
+        "flat": {
+          "count": 11254,
+          "fraction": 0.8501926418372743
+        },
+        "long": {
+          "count": 1109,
+          "fraction": 0.08378031275968875
+        }
+      },
+      "validation_label_balance": {
+        "short": {
+          "count": 278,
+          "fraction": 0.06347031963470319
+        },
+        "flat": {
+          "count": 3706,
+          "fraction": 0.8461187214611872
+        },
+        "long": {
+          "count": 396,
+          "fraction": 0.09041095890410959
+        }
+      },
+      "validation_predictions": {
+        "rows": 4386,
+        "predicted_classes": {
+          "short": {
+            "count": 9,
+            "fraction": 0.002051983584131327
+          },
+          "flat": {
+            "count": 4360,
+            "fraction": 0.9940720474236207
+          },
+          "long": {
+            "count": 17,
+            "fraction": 0.003875968992248062
+          }
+        },
+        "directional_top_class": 26,
+        "directional_and_return_agree": 24,
+        "top_probability_quantiles": {
+          "0.5": 0.885137308083102,
+          "0.75": 0.9327311179782017,
+          "0.9": 0.9589961865578259,
+          "0.95": 0.9694411248037866,
+          "0.99": 0.9810265826487244
+        },
+        "directional_coverage_by_threshold": {
+          "0.3": 24,
+          "0.4": 23,
+          "0.5": 15,
+          "0.6": 6,
+          "0.7": 1,
+          "0.75": 0
+        }
+      },
+      "holdout_label_balance_after_selection": {
+        "short": {
+          "count": 180,
+          "fraction": 0.08144796380090498
+        },
+        "flat": {
+          "count": 1883,
+          "fraction": 0.8520361990950226
+        },
+        "long": {
+          "count": 147,
+          "fraction": 0.0665158371040724
+        }
+      },
+      "holdout_predictions_after_selection": {
+        "rows": 2216,
+        "predicted_classes": {
+          "short": {
+            "count": 5,
+            "fraction": 0.002256317689530686
+          },
+          "flat": {
+            "count": 2211,
+            "fraction": 0.9977436823104693
+          },
+          "long": {
+            "count": 0,
+            "fraction": 0.0
+          }
+        },
+        "directional_top_class": 5,
+        "directional_and_return_agree": 5,
+        "top_probability_quantiles": {
+          "0.5": 0.8889589508938265,
+          "0.75": 0.9278249912771178,
+          "0.9": 0.9474715920404047,
+          "0.95": 0.9584035529779233,
+          "0.99": 0.9738659086356326
+        },
+        "directional_coverage_by_threshold": {
+          "0.3": 5,
+          "0.4": 5,
+          "0.5": 2,
+          "0.6": 0,
+          "0.7": 0,
+          "0.75": 0
+        }
+      }
+    },
+    "ETHUSDT": {
+      "pre_holdout_label_balance": {
+        "short": {
+          "count": 808,
+          "fraction": 0.06332288401253919
+        },
+        "flat": {
+          "count": 10957,
+          "fraction": 0.8586990595611286
+        },
+        "long": {
+          "count": 995,
+          "fraction": 0.07797805642633229
+        }
+      },
+      "validation_label_balance": {
+        "short": {
+          "count": 291,
+          "fraction": 0.06643835616438357
+        },
+        "flat": {
+          "count": 3743,
+          "fraction": 0.8545662100456621
+        },
+        "long": {
+          "count": 346,
+          "fraction": 0.07899543378995434
+        }
+      },
+      "validation_predictions": {
+        "rows": 4386,
+        "predicted_classes": {
+          "short": {
+            "count": 31,
+            "fraction": 0.007067943456452348
+          },
+          "flat": {
+            "count": 4350,
+            "fraction": 0.9917920656634747
+          },
+          "long": {
+            "count": 5,
+            "fraction": 0.0011399908800729594
+          }
+        },
+        "directional_top_class": 36,
+        "directional_and_return_agree": 33,
+        "top_probability_quantiles": {
+          "0.5": 0.8937563717843491,
+          "0.75": 0.9413359013211795,
+          "0.9": 0.9624738540138389,
+          "0.95": 0.9725471054389784,
+          "0.99": 0.9841774150345204
+        },
+        "directional_coverage_by_threshold": {
+          "0.3": 33,
+          "0.4": 32,
+          "0.5": 25,
+          "0.6": 5,
+          "0.7": 0,
+          "0.75": 0
+        }
+      },
+      "holdout_label_balance_after_selection": {
+        "short": {
+          "count": 159,
+          "fraction": 0.07194570135746606
+        },
+        "flat": {
+          "count": 1897,
+          "fraction": 0.8583710407239818
+        },
+        "long": {
+          "count": 154,
+          "fraction": 0.06968325791855204
+        }
+      },
+      "holdout_predictions_after_selection": {
+        "rows": 2216,
+        "predicted_classes": {
+          "short": {
+            "count": 5,
+            "fraction": 0.002256317689530686
+          },
+          "flat": {
+            "count": 2211,
+            "fraction": 0.9977436823104693
+          },
+          "long": {
+            "count": 0,
+            "fraction": 0.0
+          }
+        },
+        "directional_top_class": 5,
+        "directional_and_return_agree": 5,
+        "top_probability_quantiles": {
+          "0.5": 0.8857592821788749,
+          "0.75": 0.9262578693397345,
+          "0.9": 0.9506132061213941,
+          "0.95": 0.9611731552635667,
+          "0.99": 0.9744755505460391
+        },
+        "directional_coverage_by_threshold": {
+          "0.3": 5,
+          "0.4": 5,
+          "0.5": 2,
+          "0.6": 0,
+          "0.7": 0,
+          "0.75": 0
+        }
+      }
+    }
+  },
+  "selected_parameters": {
+    "confidence_threshold": 0.3,
+    "min_reward_risk": 0.5,
+    "selection_status": "minimum_trade_count",
+    "validation_metrics": {
+      "sharpe": 0.7486223015994177,
+      "max_drawdown": -0.021357378948535365,
+      "total_return": 0.024346025814292904,
+      "cagr": 0.012108147717069917,
+      "n_trades": 26,
+      "win_rate": 0.6538461538461539,
+      "profit_factor": 1.6483183200976732,
+      "avg_trade": 9.363856082420412,
+      "gate_passed": false
+    },
+    "validation_by_symbol": {
+      "BTCUSDT": {
+        "sharpe": 0.1342421571570647,
+        "max_drawdown": -0.03251516085974887,
+        "total_return": 0.005418880114540947,
+        "cagr": 0.002707635216412152,
+        "n_trades": 11,
+        "win_rate": 0.5454545454545454,
+        "profit_factor": 1.1284219037312126,
+        "avg_trade": 2.4631273247914143,
+        "signal_diagnostics": {
+          "prediction_rows": 4381,
+          "predictions_without_bar": 0,
+          "position_open_skips": 28,
+          "risk_halted": 0,
+          "evaluated_predictions": 4353,
+          "top_class_counts": {
+            "short": 5,
+            "flat": 4341,
+            "long": 7
+          },
+          "directional_top_class": 12,
+          "confidence_pass": 12,
+          "return_agreement": 11,
+          "signal_pass": 11,
+          "risk_plan_approved": 11,
+          "risk_plan_rejections": {}
+        }
+      },
+      "ETHUSDT": {
+        "sharpe": 0.893495401992308,
+        "max_drawdown": -0.012737465999938356,
+        "total_return": 0.04327317151404486,
+        "cagr": 0.021422264955519132,
+        "n_trades": 15,
+        "win_rate": 0.7333333333333333,
+        "profit_factor": 2.3149245588599725,
+        "avg_trade": 14.424390504681684,
+        "signal_diagnostics": {
+          "prediction_rows": 4381,
+          "predictions_without_bar": 0,
+          "position_open_skips": 38,
+          "risk_halted": 0,
+          "evaluated_predictions": 4343,
+          "top_class_counts": {
+            "short": 17,
+            "flat": 4322,
+            "long": 4
+          },
+          "directional_top_class": 21,
+          "confidence_pass": 21,
+          "return_agreement": 18,
+          "signal_pass": 18,
+          "risk_plan_approved": 15,
+          "risk_plan_rejections": {
+            "reward/risk below minimum": 3
+          }
+        }
+      }
+    }
+  },
+  "validation_grid": [
+    {
+      "confidence_threshold": 0.3,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": 0.7486223015994177,
+        "max_drawdown": -0.021357378948535365,
+        "total_return": 0.024346025814292904,
+        "cagr": 0.012108147717069917,
+        "n_trades": 26,
+        "win_rate": 0.6538461538461539,
+        "profit_factor": 1.6483183200976732,
+        "avg_trade": 9.363856082420412,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.1342421571570647,
+          "max_drawdown": -0.03251516085974887,
+          "total_return": 0.005418880114540947,
+          "cagr": 0.002707635216412152,
+          "n_trades": 11,
+          "win_rate": 0.5454545454545454,
+          "profit_factor": 1.1284219037312126,
+          "avg_trade": 2.4631273247914143,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 28,
+            "risk_halted": 0,
+            "evaluated_predictions": 4353,
+            "top_class_counts": {
+              "short": 5,
+              "flat": 4341,
+              "long": 7
+            },
+            "directional_top_class": 12,
+            "confidence_pass": 12,
+            "return_agreement": 11,
+            "signal_pass": 11,
+            "risk_plan_approved": 11,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.893495401992308,
+          "max_drawdown": -0.012737465999938356,
+          "total_return": 0.04327317151404486,
+          "cagr": 0.021422264955519132,
+          "n_trades": 15,
+          "win_rate": 0.7333333333333333,
+          "profit_factor": 2.3149245588599725,
+          "avg_trade": 14.424390504681684,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 38,
+            "risk_halted": 0,
+            "evaluated_predictions": 4343,
+            "top_class_counts": {
+              "short": 17,
+              "flat": 4322,
+              "long": 4
+            },
+            "directional_top_class": 21,
+            "confidence_pass": 21,
+            "return_agreement": 18,
+            "signal_pass": 18,
+            "risk_plan_approved": 15,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": 0.6924154158256309,
+        "max_drawdown": -0.01123248709541209,
+        "total_return": 0.019847601467722686,
+        "cagr": 0.009881839538931292,
+        "n_trades": 19,
+        "win_rate": 0.631578947368421,
+        "profit_factor": 1.7710609550165886,
+        "avg_trade": 10.446106035643515,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.13700145530223143,
+          "max_drawdown": -0.02266676772412055,
+          "total_return": 0.00499090459097018,
+          "cagr": 0.0024940556137886816,
+          "n_trades": 8,
+          "win_rate": 0.5,
+          "profit_factor": 1.1627092559388374,
+          "avg_trade": 3.1193153693562037,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 25,
+            "risk_halted": 0,
+            "evaluated_predictions": 4356,
+            "top_class_counts": {
+              "short": 5,
+              "flat": 4343,
+              "long": 8
+            },
+            "directional_top_class": 13,
+            "confidence_pass": 13,
+            "return_agreement": 12,
+            "signal_pass": 12,
+            "risk_plan_approved": 8,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 4
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.8222173222649302,
+          "max_drawdown": -0.013802495229592664,
+          "total_return": 0.03470429834447519,
+          "cagr": 0.017216042178741064,
+          "n_trades": 11,
+          "win_rate": 0.7272727272727273,
+          "profit_factor": 2.667873051112494,
+          "avg_trade": 15.774681065670649,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 29,
+            "risk_halted": 0,
+            "evaluated_predictions": 4352,
+            "top_class_counts": {
+              "short": 21,
+              "flat": 4326,
+              "long": 5
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 26,
+            "return_agreement": 23,
+            "signal_pass": 23,
+            "risk_plan_approved": 11,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 12
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": -0.002901350441532056,
+        "max_drawdown": -0.011749557974889607,
+        "total_return": -0.0001779589845511964,
+        "cagr": -8.904439615864401e-05,
+        "n_trades": 9,
+        "win_rate": 0.5555555555555556,
+        "profit_factor": 0.9918664293724558,
+        "avg_trade": -0.19773220505679096,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.06849003219543759,
+          "max_drawdown": -0.02339799200812579,
+          "total_return": -0.0028621332920311104,
+          "cagr": -0.0014330722717101896,
+          "n_trades": 6,
+          "win_rate": 0.5,
+          "profit_factor": 0.913850472015895,
+          "avg_trade": -2.385111076692541,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 13,
+            "risk_halted": 0,
+            "evaluated_predictions": 4368,
+            "top_class_counts": {
+              "short": 8,
+              "flat": 4348,
+              "long": 12
+            },
+            "directional_top_class": 20,
+            "confidence_pass": 20,
+            "return_agreement": 18,
+            "signal_pass": 18,
+            "risk_plan_approved": 6,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 12
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.11813403794855389,
+          "max_drawdown": -0.010400624131156782,
+          "total_return": 0.0025062153229289397,
+          "cagr": 0.001253181797447267,
+          "n_trades": 3,
+          "win_rate": 0.6666666666666666,
+          "profit_factor": 1.2378654241896918,
+          "avg_trade": 4.17702553821471,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 9,
+            "risk_halted": 0,
+            "evaluated_predictions": 4372,
+            "top_class_counts": {
+              "short": 27,
+              "flat": 4340,
+              "long": 5
+            },
+            "directional_top_class": 32,
+            "confidence_pass": 32,
+            "return_agreement": 29,
+            "signal_pass": 29,
+            "risk_plan_approved": 3,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 26
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": -0.5108446521352514,
+        "max_drawdown": -0.007512660767656369,
+        "total_return": -0.0043914815449179745,
+        "cagr": -0.002199660648628199,
+        "n_trades": 2,
+        "win_rate": 0.5,
+        "profit_factor": 0.18058668792053695,
+        "avg_trade": -21.957407724589963,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.7066229584948089,
+          "max_drawdown": -0.014526458569085826,
+          "total_return": -0.010718599466668421,
+          "cagr": -0.005377408993509913,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -53.5929973333424,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 3,
+            "risk_halted": 0,
+            "evaluated_predictions": 4378,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4353,
+              "long": 16
+            },
+            "directional_top_class": 25,
+            "confidence_pass": 25,
+            "return_agreement": 23,
+            "signal_pass": 23,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 22
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.24474575925123324,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.0019356363768325835,
+          "cagr": 0.0009680131943963222,
+          "n_trades": 1,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 9.678181884162473,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 5,
+            "risk_halted": 0,
+            "evaluated_predictions": 4376,
+            "top_class_counts": {
+              "short": 28,
+              "flat": 4343,
+              "long": 5
+            },
+            "directional_top_class": 33,
+            "confidence_pass": 33,
+            "return_agreement": 30,
+            "signal_pass": 30,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 29
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 26,
+            "return_agreement": 24,
+            "signal_pass": 24,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 24
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 36,
+            "return_agreement": 33,
+            "signal_pass": 33,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 33
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": 0.7486223015994177,
+        "max_drawdown": -0.021357378948535365,
+        "total_return": 0.024346025814292904,
+        "cagr": 0.012108147717069917,
+        "n_trades": 26,
+        "win_rate": 0.6538461538461539,
+        "profit_factor": 1.6483183200976732,
+        "avg_trade": 9.363856082420412,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.1342421571570647,
+          "max_drawdown": -0.03251516085974887,
+          "total_return": 0.005418880114540947,
+          "cagr": 0.002707635216412152,
+          "n_trades": 11,
+          "win_rate": 0.5454545454545454,
+          "profit_factor": 1.1284219037312126,
+          "avg_trade": 2.4631273247914143,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 28,
+            "risk_halted": 0,
+            "evaluated_predictions": 4353,
+            "top_class_counts": {
+              "short": 5,
+              "flat": 4341,
+              "long": 7
+            },
+            "directional_top_class": 12,
+            "confidence_pass": 11,
+            "return_agreement": 11,
+            "signal_pass": 11,
+            "risk_plan_approved": 11,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.893495401992308,
+          "max_drawdown": -0.012737465999938356,
+          "total_return": 0.04327317151404486,
+          "cagr": 0.021422264955519132,
+          "n_trades": 15,
+          "win_rate": 0.7333333333333333,
+          "profit_factor": 2.3149245588599725,
+          "avg_trade": 14.424390504681684,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 38,
+            "risk_halted": 0,
+            "evaluated_predictions": 4343,
+            "top_class_counts": {
+              "short": 17,
+              "flat": 4322,
+              "long": 4
+            },
+            "directional_top_class": 21,
+            "confidence_pass": 19,
+            "return_agreement": 17,
+            "signal_pass": 17,
+            "risk_plan_approved": 15,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": 0.6924154158256309,
+        "max_drawdown": -0.01123248709541209,
+        "total_return": 0.019847601467722686,
+        "cagr": 0.009881839538931292,
+        "n_trades": 19,
+        "win_rate": 0.631578947368421,
+        "profit_factor": 1.7710609550165886,
+        "avg_trade": 10.446106035643515,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.13700145530223143,
+          "max_drawdown": -0.02266676772412055,
+          "total_return": 0.00499090459097018,
+          "cagr": 0.0024940556137886816,
+          "n_trades": 8,
+          "win_rate": 0.5,
+          "profit_factor": 1.1627092559388374,
+          "avg_trade": 3.1193153693562037,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 25,
+            "risk_halted": 0,
+            "evaluated_predictions": 4356,
+            "top_class_counts": {
+              "short": 5,
+              "flat": 4343,
+              "long": 8
+            },
+            "directional_top_class": 13,
+            "confidence_pass": 12,
+            "return_agreement": 12,
+            "signal_pass": 12,
+            "risk_plan_approved": 8,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 4
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.8222173222649302,
+          "max_drawdown": -0.013802495229592664,
+          "total_return": 0.03470429834447519,
+          "cagr": 0.017216042178741064,
+          "n_trades": 11,
+          "win_rate": 0.7272727272727273,
+          "profit_factor": 2.667873051112494,
+          "avg_trade": 15.774681065670649,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 29,
+            "risk_halted": 0,
+            "evaluated_predictions": 4352,
+            "top_class_counts": {
+              "short": 21,
+              "flat": 4326,
+              "long": 5
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 24,
+            "return_agreement": 22,
+            "signal_pass": 22,
+            "risk_plan_approved": 11,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 11
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": -0.002901350441532056,
+        "max_drawdown": -0.011749557974889607,
+        "total_return": -0.0001779589845511964,
+        "cagr": -8.904439615864401e-05,
+        "n_trades": 9,
+        "win_rate": 0.5555555555555556,
+        "profit_factor": 0.9918664293724558,
+        "avg_trade": -0.19773220505679096,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.06849003219543759,
+          "max_drawdown": -0.02339799200812579,
+          "total_return": -0.0028621332920311104,
+          "cagr": -0.0014330722717101896,
+          "n_trades": 6,
+          "win_rate": 0.5,
+          "profit_factor": 0.913850472015895,
+          "avg_trade": -2.385111076692541,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 13,
+            "risk_halted": 0,
+            "evaluated_predictions": 4368,
+            "top_class_counts": {
+              "short": 8,
+              "flat": 4348,
+              "long": 12
+            },
+            "directional_top_class": 20,
+            "confidence_pass": 18,
+            "return_agreement": 17,
+            "signal_pass": 17,
+            "risk_plan_approved": 6,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 11
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.11813403794855389,
+          "max_drawdown": -0.010400624131156782,
+          "total_return": 0.0025062153229289397,
+          "cagr": 0.001253181797447267,
+          "n_trades": 3,
+          "win_rate": 0.6666666666666666,
+          "profit_factor": 1.2378654241896918,
+          "avg_trade": 4.17702553821471,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 9,
+            "risk_halted": 0,
+            "evaluated_predictions": 4372,
+            "top_class_counts": {
+              "short": 27,
+              "flat": 4340,
+              "long": 5
+            },
+            "directional_top_class": 32,
+            "confidence_pass": 30,
+            "return_agreement": 28,
+            "signal_pass": 28,
+            "risk_plan_approved": 3,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 25
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": -0.5108446521352514,
+        "max_drawdown": -0.007512660767656369,
+        "total_return": -0.0043914815449179745,
+        "cagr": -0.002199660648628199,
+        "n_trades": 2,
+        "win_rate": 0.5,
+        "profit_factor": 0.18058668792053695,
+        "avg_trade": -21.957407724589963,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.7066229584948089,
+          "max_drawdown": -0.014526458569085826,
+          "total_return": -0.010718599466668421,
+          "cagr": -0.005377408993509913,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -53.5929973333424,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 3,
+            "risk_halted": 0,
+            "evaluated_predictions": 4378,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4353,
+              "long": 16
+            },
+            "directional_top_class": 25,
+            "confidence_pass": 23,
+            "return_agreement": 22,
+            "signal_pass": 22,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 21
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.24474575925123324,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.0019356363768325835,
+          "cagr": 0.0009680131943963222,
+          "n_trades": 1,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 9.678181884162473,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 5,
+            "risk_halted": 0,
+            "evaluated_predictions": 4376,
+            "top_class_counts": {
+              "short": 28,
+              "flat": 4343,
+              "long": 5
+            },
+            "directional_top_class": 33,
+            "confidence_pass": 31,
+            "return_agreement": 29,
+            "signal_pass": 29,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 28
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 24,
+            "return_agreement": 23,
+            "signal_pass": 23,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 23
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 34,
+            "return_agreement": 32,
+            "signal_pass": 32,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": 0.1871286084696899,
+        "max_drawdown": -0.021355814621375827,
+        "total_return": 0.0052098027263385305,
+        "cagr": 0.0026033015953306204,
+        "n_trades": 21,
+        "win_rate": 0.5714285714285714,
+        "profit_factor": 1.140372293409051,
+        "avg_trade": 2.4808584411135137,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.5240455650276569,
+          "max_drawdown": -0.03251516085974897,
+          "total_return": -0.018360954586157274,
+          "cagr": -0.009229297131043035,
+          "n_trades": 8,
+          "win_rate": 0.375,
+          "profit_factor": 0.560214908921878,
+          "avg_trade": -11.47559661634834,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 22,
+            "risk_halted": 0,
+            "evaluated_predictions": 4359,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4342,
+              "long": 8
+            },
+            "directional_top_class": 17,
+            "confidence_pass": 8,
+            "return_agreement": 8,
+            "signal_pass": 8,
+            "risk_plan_approved": 8,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.6286400763817077,
+          "max_drawdown": -0.012737465999938287,
+          "total_return": 0.028780560038834224,
+          "cagr": 0.014298059711254085,
+          "n_trades": 13,
+          "win_rate": 0.6923076923076923,
+          "profit_factor": 1.8861411405571624,
+          "avg_trade": 11.069446168782342,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 38,
+            "risk_halted": 0,
+            "evaluated_predictions": 4343,
+            "top_class_counts": {
+              "short": 17,
+              "flat": 4322,
+              "long": 4
+            },
+            "directional_top_class": 21,
+            "confidence_pass": 14,
+            "return_agreement": 13,
+            "signal_pass": 13,
+            "risk_plan_approved": 13,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": 0.5149470219692499,
+        "max_drawdown": -0.011169026966181217,
+        "total_return": 0.012431010960555877,
+        "cagr": 0.00620056553908821,
+        "n_trades": 15,
+        "win_rate": 0.6,
+        "profit_factor": 1.6143429794208597,
+        "avg_trade": 8.287340640370717,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.426162076837281,
+          "max_drawdown": -0.022666767724120716,
+          "total_return": -0.012874714510727192,
+          "cagr": -0.006462620611446979,
+          "n_trades": 6,
+          "win_rate": 0.3333333333333333,
+          "profit_factor": 0.5780073476260847,
+          "avg_trade": -10.72892875893941,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 20,
+            "risk_halted": 0,
+            "evaluated_predictions": 4361,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4343,
+              "long": 9
+            },
+            "directional_top_class": 18,
+            "confidence_pass": 8,
+            "return_agreement": 8,
+            "signal_pass": 8,
+            "risk_plan_approved": 6,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 2
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.9781308289148758,
+          "max_drawdown": -0.011385631320256833,
+          "total_return": 0.03773673643183928,
+          "cagr": 0.018706564971661566,
+          "n_trades": 9,
+          "win_rate": 0.7777777777777778,
+          "profit_factor": 4.788846864198779,
+          "avg_trade": 20.96485357324413,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 27,
+            "risk_halted": 0,
+            "evaluated_predictions": 4354,
+            "top_class_counts": {
+              "short": 21,
+              "flat": 4328,
+              "long": 5
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 16,
+            "return_agreement": 15,
+            "signal_pass": 15,
+            "risk_plan_approved": 9,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": -0.27966349234876625,
+        "max_drawdown": -0.011625539291218288,
+        "total_return": -0.004982282899235857,
+        "cagr": -0.0024959583544119646,
+        "n_trades": 6,
+        "win_rate": 0.5,
+        "profit_factor": 0.6978814429909376,
+        "avg_trade": -8.303804832059999,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.7530084888815733,
+          "max_drawdown": -0.02676761469102235,
+          "total_return": -0.02300705528342517,
+          "cagr": -0.011578344396656837,
+          "n_trades": 4,
+          "win_rate": 0.25,
+          "profit_factor": 0.30244242610932165,
+          "avg_trade": -28.758819104281546,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 12,
+            "risk_halted": 0,
+            "evaluated_predictions": 4369,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4348,
+              "long": 12
+            },
+            "directional_top_class": 21,
+            "confidence_pass": 11,
+            "return_agreement": 11,
+            "signal_pass": 11,
+            "risk_plan_approved": 4,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 7
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.7410033031133603,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.013042489484953235,
+          "cagr": 0.006504585553818609,
+          "n_trades": 2,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 32.6062237123831,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 7,
+            "risk_halted": 0,
+            "evaluated_predictions": 4374,
+            "top_class_counts": {
+              "short": 27,
+              "flat": 4342,
+              "long": 5
+            },
+            "directional_top_class": 32,
+            "confidence_pass": 22,
+            "return_agreement": 21,
+            "signal_pass": 21,
+            "risk_plan_approved": 2,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 19
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": -0.5108446521352514,
+        "max_drawdown": -0.007512660767656369,
+        "total_return": -0.0043914815449179745,
+        "cagr": -0.002199660648628199,
+        "n_trades": 2,
+        "win_rate": 0.5,
+        "profit_factor": 0.18058668792053695,
+        "avg_trade": -21.957407724589963,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.7066229584948089,
+          "max_drawdown": -0.014526458569085826,
+          "total_return": -0.010718599466668421,
+          "cagr": -0.005377408993509913,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -53.5929973333424,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 3,
+            "risk_halted": 0,
+            "evaluated_predictions": 4378,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4353,
+              "long": 16
+            },
+            "directional_top_class": 25,
+            "confidence_pass": 15,
+            "return_agreement": 15,
+            "signal_pass": 15,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 14
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.24474575925123324,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.0019356363768325835,
+          "cagr": 0.0009680131943963222,
+          "n_trades": 1,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 9.678181884162473,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 5,
+            "risk_halted": 0,
+            "evaluated_predictions": 4376,
+            "top_class_counts": {
+              "short": 28,
+              "flat": 4343,
+              "long": 5
+            },
+            "directional_top_class": 33,
+            "confidence_pass": 23,
+            "return_agreement": 22,
+            "signal_pass": 22,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 21
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 15,
+            "return_agreement": 15,
+            "signal_pass": 15,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 15
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 26,
+            "return_agreement": 25,
+            "signal_pass": 25,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 25
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": 0.06796527194715915,
+        "max_drawdown": -0.007348836826466124,
+        "total_return": 0.0004866176408082623,
+        "cagr": 0.00024344587790192662,
+        "n_trades": 4,
+        "win_rate": 0.5,
+        "profit_factor": 1.1127635489093648,
+        "avg_trade": 1.2165441020204266,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.8958588256131762,
+          "max_drawdown": -0.01473682293660852,
+          "total_return": -0.008630761367741213,
+          "cagr": -0.004327688065325241,
+          "n_trades": 2,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -21.576903419353037,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 10,
+            "risk_halted": 0,
+            "evaluated_predictions": 4371,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4351,
+              "long": 11
+            },
+            "directional_top_class": 20,
+            "confidence_pass": 2,
+            "return_agreement": 2,
+            "signal_pass": 2,
+            "risk_plan_approved": 2,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.8619755645483025,
+          "max_drawdown": -0.005040472445992311,
+          "total_return": 0.009603996649357516,
+          "cagr": 0.004793812798515207,
+          "n_trades": 2,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 24.009991623393894,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 8,
+            "risk_halted": 0,
+            "evaluated_predictions": 4373,
+            "top_class_counts": {
+              "short": 26,
+              "flat": 4342,
+              "long": 5
+            },
+            "directional_top_class": 31,
+            "confidence_pass": 2,
+            "return_agreement": 2,
+            "signal_pass": 2,
+            "risk_plan_approved": 2,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": 0.06796527194715915,
+        "max_drawdown": -0.007348836826466124,
+        "total_return": 0.0004866176408082623,
+        "cagr": 0.00024344587790192662,
+        "n_trades": 4,
+        "win_rate": 0.5,
+        "profit_factor": 1.1127635489093648,
+        "avg_trade": 1.2165441020204266,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.8958588256131762,
+          "max_drawdown": -0.01473682293660852,
+          "total_return": -0.008630761367741213,
+          "cagr": -0.004327688065325241,
+          "n_trades": 2,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -21.576903419353037,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 10,
+            "risk_halted": 0,
+            "evaluated_predictions": 4371,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4351,
+              "long": 11
+            },
+            "directional_top_class": 20,
+            "confidence_pass": 2,
+            "return_agreement": 2,
+            "signal_pass": 2,
+            "risk_plan_approved": 2,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.8619755645483025,
+          "max_drawdown": -0.005040472445992311,
+          "total_return": 0.009603996649357516,
+          "cagr": 0.004793812798515207,
+          "n_trades": 2,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 24.009991623393894,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 8,
+            "risk_halted": 0,
+            "evaluated_predictions": 4373,
+            "top_class_counts": {
+              "short": 26,
+              "flat": 4342,
+              "long": 5
+            },
+            "directional_top_class": 31,
+            "confidence_pass": 2,
+            "return_agreement": 2,
+            "signal_pass": 2,
+            "risk_plan_approved": 2,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": -0.5231241816521762,
+        "max_drawdown": -0.007073565294745807,
+        "total_return": -0.0046750566078884725,
+        "cagr": -0.002341867772157613,
+        "n_trades": 2,
+        "win_rate": 0.5,
+        "profit_factor": 0.17151154745627537,
+        "avg_trade": -23.375283039442664,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.7066229584948087,
+          "max_drawdown": -0.012945660511464825,
+          "total_return": -0.011285749592609529,
+          "cagr": -0.00566275124782567,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -56.4287479630478,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 3,
+            "risk_halted": 0,
+            "evaluated_predictions": 4378,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 14
+            },
+            "directional_top_class": 23,
+            "confidence_pass": 3,
+            "return_agreement": 3,
+            "signal_pass": 3,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 2
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.24474575925123324,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.0019356363768325835,
+          "cagr": 0.0009680131943963222,
+          "n_trades": 1,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 9.678181884162473,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 5,
+            "risk_halted": 0,
+            "evaluated_predictions": 4376,
+            "top_class_counts": {
+              "short": 28,
+              "flat": 4343,
+              "long": 5
+            },
+            "directional_top_class": 33,
+            "confidence_pass": 4,
+            "return_agreement": 4,
+            "signal_pass": 4,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": 0.24371958371745858,
+        "max_drawdown": -0.0015928319308962137,
+        "total_return": 0.0009678181884162917,
+        "cagr": 0.0004841235114532161,
+        "n_trades": 1,
+        "win_rate": 1.0,
+        "profit_factor": null,
+        "avg_trade": 9.678181884162473,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 6,
+            "return_agreement": 6,
+            "signal_pass": 6,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 6
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.24474575925123324,
+          "max_drawdown": -0.0031780055849123814,
+          "total_return": 0.0019356363768325835,
+          "cagr": 0.0009680131943963222,
+          "n_trades": 1,
+          "win_rate": 1.0,
+          "profit_factor": null,
+          "avg_trade": 9.678181884162473,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 5,
+            "risk_halted": 0,
+            "evaluated_predictions": 4376,
+            "top_class_counts": {
+              "short": 28,
+              "flat": 4343,
+              "long": 5
+            },
+            "directional_top_class": 33,
+            "confidence_pass": 4,
+            "return_agreement": 4,
+            "signal_pass": 4,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 6,
+            "return_agreement": 6,
+            "signal_pass": 6,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 6
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 5,
+            "return_agreement": 5,
+            "signal_pass": 5,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.7,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": -0.706622958494809,
+        "max_drawdown": -0.005613263488180928,
+        "total_return": -0.00561326348818092,
+        "cagr": -0.0028125037741910663,
+        "n_trades": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "avg_trade": -56.1326348818096,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.706622958494809,
+          "max_drawdown": -0.011226526976361857,
+          "total_return": -0.01122652697636184,
+          "cagr": -0.0056329515836531785,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -56.1326348818096,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 2,
+            "risk_halted": 0,
+            "evaluated_predictions": 4379,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 15
+            },
+            "directional_top_class": 24,
+            "confidence_pass": 1,
+            "return_agreement": 1,
+            "signal_pass": 1,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.7,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": -0.706622958494809,
+        "max_drawdown": -0.005613263488180928,
+        "total_return": -0.00561326348818092,
+        "cagr": -0.0028125037741910663,
+        "n_trades": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "avg_trade": -56.1326348818096,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.706622958494809,
+          "max_drawdown": -0.011226526976361857,
+          "total_return": -0.01122652697636184,
+          "cagr": -0.0056329515836531785,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -56.1326348818096,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 2,
+            "risk_halted": 0,
+            "evaluated_predictions": 4379,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 15
+            },
+            "directional_top_class": 24,
+            "confidence_pass": 1,
+            "return_agreement": 1,
+            "signal_pass": 1,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.7,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": -0.706622958494809,
+        "max_drawdown": -0.005613263488180928,
+        "total_return": -0.00561326348818092,
+        "cagr": -0.0028125037741910663,
+        "n_trades": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "avg_trade": -56.1326348818096,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": -0.706622958494809,
+          "max_drawdown": -0.011226526976361857,
+          "total_return": -0.01122652697636184,
+          "cagr": -0.0056329515836531785,
+          "n_trades": 1,
+          "win_rate": 0.0,
+          "profit_factor": 0.0,
+          "avg_trade": -56.1326348818096,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 2,
+            "risk_halted": 0,
+            "evaluated_predictions": 4379,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 15
+            },
+            "directional_top_class": 24,
+            "confidence_pass": 1,
+            "return_agreement": 1,
+            "signal_pass": 1,
+            "risk_plan_approved": 1,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.7,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 1,
+            "return_agreement": 1,
+            "signal_pass": 1,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 1
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.7,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 1,
+            "return_agreement": 1,
+            "signal_pass": 1,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {
+              "reward/risk below minimum": 1
+            }
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.75,
+      "min_reward_risk": 0.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.75,
+      "min_reward_risk": 0.75,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.75,
+      "min_reward_risk": 1.0,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.75,
+      "min_reward_risk": 1.25,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    },
+    {
+      "confidence_threshold": 0.75,
+      "min_reward_risk": 1.5,
+      "portfolio": {
+        "sharpe": 0.0,
+        "max_drawdown": 0.0,
+        "total_return": 0.0,
+        "cagr": 0.0,
+        "n_trades": 0,
+        "gate_passed": false
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 9,
+              "flat": 4355,
+              "long": 17
+            },
+            "directional_top_class": 26,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        },
+        "ETHUSDT": {
+          "sharpe": 0.0,
+          "max_drawdown": 0.0,
+          "total_return": 0.0,
+          "cagr": 0.0,
+          "n_trades": 0,
+          "signal_diagnostics": {
+            "prediction_rows": 4381,
+            "predictions_without_bar": 0,
+            "position_open_skips": 0,
+            "risk_halted": 0,
+            "evaluated_predictions": 4381,
+            "top_class_counts": {
+              "short": 31,
+              "flat": 4345,
+              "long": 5
+            },
+            "directional_top_class": 36,
+            "confidence_pass": 0,
+            "return_agreement": 0,
+            "signal_pass": 0,
+            "risk_plan_approved": 0,
+            "risk_plan_rejections": {}
+          }
+        }
+      }
+    }
+  ],
+  "final_holdout": {
+    "portfolio": {
+      "sharpe": -1.7912838758303848,
+      "max_drawdown": -0.017543010365083683,
+      "total_return": -0.014880646192748093,
+      "cagr": -0.01473053947240277,
+      "n_trades": 5,
+      "win_rate": 0.2,
+      "profit_factor": 0.15176210450372626,
+      "avg_trade": -29.76129238549595,
+      "gate_passed": false
+    },
+    "per_symbol": {
+      "BTCUSDT": {
+        "sharpe": -1.6108233152299027,
+        "max_drawdown": -0.02176883401725754,
+        "total_return": -0.021768834017257488,
+        "cagr": -0.021550007160569873,
+        "n_trades": 2,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "avg_trade": -54.42208504314373,
+        "signal_diagnostics": {
+          "prediction_rows": 2210,
+          "predictions_without_bar": 0,
+          "position_open_skips": 4,
+          "risk_halted": 0,
+          "evaluated_predictions": 2206,
+          "top_class_counts": {
+            "short": 3,
+            "flat": 2203,
+            "long": 0
+          },
+          "directional_top_class": 3,
+          "confidence_pass": 3,
+          "return_agreement": 3,
+          "signal_pass": 3,
+          "risk_plan_approved": 2,
+          "risk_plan_rejections": {
+            "reward/risk below minimum": 1
+          }
+        }
+      },
+      "ETHUSDT": {
+        "sharpe": -0.8223478600968899,
+        "max_drawdown": -0.013393130336671664,
+        "total_return": -0.007992458368238475,
+        "cagr": -0.007911556357705796,
+        "n_trades": 3,
+        "win_rate": 0.3333333333333333,
+        "profit_factor": 0.39983882928589215,
+        "avg_trade": -13.320763947064094,
+        "signal_diagnostics": {
+          "prediction_rows": 2210,
+          "predictions_without_bar": 0,
+          "position_open_skips": 10,
+          "risk_halted": 0,
+          "evaluated_predictions": 2200,
+          "top_class_counts": {
+            "short": 3,
+            "flat": 2197,
+            "long": 0
+          },
+          "directional_top_class": 3,
+          "confidence_pass": 3,
+          "return_agreement": 3,
+          "signal_pass": 3,
+          "risk_plan_approved": 3,
+          "risk_plan_rejections": {}
+        }
+      }
+    }
+  },
+  "active_config_unchanged": true
+}

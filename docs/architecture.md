@@ -29,9 +29,9 @@ The same feature builder and risk engine are used for training, backtesting and 
 | `data/sources/` | `binance_rest` (public market data), `binance_archive` (historic metrics), `adapters` (on-chain/liquidation provider stubs) |
 | `data/ingest/` | `backfill` (idempotent history + gap detection), `live` (WebSocket collectors + polling) |
 | `features/` | `builder` (leakage-safe features), `pipeline` (DB → features) |
-| `labeling/` | Forward-return labels and regression target |
-| `models/` | `ensemble`, `cv` (purged walk-forward), `train` (CV, Optuna, walk-forward predictions), `registry`, `retrain` |
-| `backtest/` | `engine` (bar simulator), `metrics`, `run` (walk-forward portfolio report) |
+| `labeling/` | Forward-return labels and regression target in `labels.py`; triple-barrier labels in `barriers.py` |
+| `models/` | `ensemble`, `barrier` (calibrated binary models), `barrier_experiment`, `cv` (purged walk-forward), `train` (CV, Optuna, walk-forward predictions), `registry`, `retrain` |
+| `backtest/` | `engine` (bar simulator), `metrics`, `run` (classic walk-forward report), `segments`, `run_barrier`, `baselines` |
 | `risk/` | `limits` (hard maxima), `engine` (signal + sizing), `kill_switch` |
 | `execution/` | `client` (Binance SDK adapter), `filters`, `manager` (orders, reconcile, exits), `user_stream` |
 | `scheduler/` | `runner`: 4h live loop and weekly retrain |

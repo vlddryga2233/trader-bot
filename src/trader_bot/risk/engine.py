@@ -1,6 +1,7 @@
 """Hard-coded risk rules. These run after the model and can only veto or shrink a trade."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from trader_bot.config.settings import RiskCfg
@@ -32,6 +33,32 @@ class TradePlan:
 @dataclass(frozen=True)
 class Rejection:
     reason: str
+
+
+def round_trip_cost(taker_fee: float, slippage_bps: float) -> float:
+    """Entry + exit cost as a fraction of price."""
+    return 2 * (taker_fee + slippage_bps / 10_000)
+
+
+def make_ev_signal(p_long_win: float, p_short_win: float, price: float, atr: float,
+                   stop_mult: float, tp_mult: float, cost_frac: float,
+                   min_ev_r: float) -> Signal | None:
+    """Choose a side only when its estimated net expected value clears the R threshold."""
+    values = (p_long_win, p_short_win, price, atr, stop_mult, tp_mult, cost_frac, min_ev_r)
+    if not all(math.isfinite(v) for v in values) or price <= 0 or atr <= 0:
+        return None
+    stop_dist = max(stop_mult, limits.MIN_ATR_STOP_MULT) * atr
+    rr = tp_mult * atr / stop_dist
+    cost_r = cost_frac * price / stop_dist
+    ev_long = p_long_win * rr - (1 - p_long_win) - cost_r
+    ev_short = p_short_win * rr - (1 - p_short_win) - cost_r
+    if ev_long >= ev_short:
+        direction, prob, ev = 1, p_long_win, ev_long
+    else:
+        direction, prob, ev = -1, p_short_win, ev_short
+    if ev < min_ev_r:
+        return None
+    return Signal(direction, prob, direction * tp_mult * atr / price * (1 + 1e-9))
 
 
 def make_signal(p_short: float, p_flat: float, p_long: float, pred_ret: float,

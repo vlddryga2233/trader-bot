@@ -31,3 +31,22 @@ def compute_metrics(equity: pd.Series, trades: pd.DataFrame) -> dict:
 
 def passes_gate(m: dict, min_sharpe: float = 1.5, max_dd: float = 0.15) -> bool:
     return m["sharpe"] > min_sharpe and abs(m["max_drawdown"]) < max_dd
+
+
+def bootstrap_sharpe_ci(equity: pd.Series, n_boot: int = 1000, block: int = 10,
+                        seed: int = 0) -> list[float] | None:
+    """90% block-bootstrap interval of annualised daily Sharpe."""
+    rets = equity.resample("1D").last().dropna().pct_change().dropna().to_numpy()
+    n = len(rets)
+    if n < 2 * block:
+        return None
+    rng = np.random.default_rng(seed)
+    n_blocks = int(np.ceil(n / block))
+    sharpes = []
+    for _ in range(n_boot):
+        starts = rng.integers(0, n - block + 1, n_blocks)
+        sample = np.concatenate([rets[s:s + block] for s in starts])[:n]
+        sd = sample.std(ddof=1)
+        sharpes.append(sample.mean() / sd * np.sqrt(365) if sd > 0 else 0.0)
+    low, high = np.percentile(sharpes, [5, 95])
+    return [float(low), float(high)]

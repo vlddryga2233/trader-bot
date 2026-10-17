@@ -16,7 +16,7 @@ def retrain_symbol(engine: Engine, cfg: StrategyConfig, registry: ModelRegistry,
     """Train on labeled history and promote only if CV directional quality clears its gates."""
     feats, _ = features_for_symbol(engine, symbol, cfg)
     ds = build_dataset(feats, cfg)
-    params = tune(ds, cfg) if do_tune else None
+    params = tune(ds, cfg) if do_tune else registry.current_params(symbol)
     metrics = cv_evaluate(ds, cfg, params)
     ens = fit_final(ds, params, cfg.model.class_balance)
     version = registry.save(symbol, ens, metrics, {

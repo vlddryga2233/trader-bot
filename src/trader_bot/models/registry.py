@@ -36,6 +36,13 @@ class ModelRegistry:
     def meta(self, symbol: str, version: str) -> dict:
         return json.loads((self._dir(symbol) / version / "meta.json").read_text())
 
+    def current_params(self, symbol: str) -> dict | None:
+        """Hyperparameters saved with the promoted model, if any."""
+        version = self.current_version(symbol)
+        if version is None:
+            return None
+        return self.meta(symbol, version).get("params")
+
     def promote(self, symbol: str, version: str) -> None:
         (self._dir(symbol) / "current.json").write_text(json.dumps({"version": version}))
 

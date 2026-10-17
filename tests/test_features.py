@@ -48,6 +48,13 @@ def test_index_is_candle_close_time():
     assert feats.index[0] == k4.index[0] + pd.Timedelta(hours=4)
 
 
+def test_ctx_high_low_are_not_model_inputs():
+    feats = _build(*_inputs())
+    assert "ctx_high" in feats.columns and "ctx_low" in feats.columns
+    assert "ctx_high" not in model_columns(feats)
+    assert "ctx_low" not in model_columns(feats)
+
+
 def test_no_future_leakage_when_future_is_truncated():
     """Features at time t must be identical if all data after t is removed."""
     full = _build(*_inputs())

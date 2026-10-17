@@ -13,7 +13,7 @@ The repository has a substantial ML, backtesting, risk, and execution foundation
 
 ## Gaps to Close
 
-1. **Rule-based baselines:** There is no documented comparison against simple rule-based strategies under the same symbols, dates, sizing, and cost assumptions. Without this, the incremental value of ML is unknown.
+1. **Rule-based baselines:** `trader-bot baselines` now provides simple rule-based strategies under the same symbols, dates, sizing, and cost assumptions. Run and record its report alongside model results before judging the incremental value of ML.
 2. **Untouched final evaluation:** Strategy and threshold selection need to be separated from a final holdout period. Repeatedly tuning against the same backtest risks selecting for historical noise.
 3. **Futures simulation fidelity:** The backtest models fees, slippage, and funding, but the available docs do not show liquidation or maintenance-margin-tier simulation, or validation of exchange trigger and fill behavior. Binance futures liquidation depends on mark price and maintenance margin; those mechanics should be reflected in risk checks and simulation.
 4. **Combined portfolio risk:** BTC and ETH exposure is assessed as independent books in the documented backtest. Risk should also be evaluated across the combined account, including correlated positions and unrealized P&L.

@@ -30,6 +30,17 @@ Training CV metrics now include per-fold train/test class counts, predicted clas
 
 An experiment command is now available: `uv run trader-bot experiment` compares ATR flat-label multipliers 0.5, 1.0, and 1.5 with unweighted and balanced classifiers using the existing purged CV folds. For separate backtest sensitivity runs, use `uv run trader-bot backtest --min-reward-risk 1.0 --out artifacts/backtest_rr1` or add `--balance-classes` and/or `--flat-atr-mult 0.5`. These experiments do not change defaults.
 
+### Barrier research checkpoint (2026-10-17)
+
+The phase 11 protocol was run in order. Reports:
+
+- Baselines: `artifacts/baselines/report.json`
+- Pre-holdout barrier experiment: `artifacts/experiments/barrier-20261017T095437Z/report.json`
+
+The baseline strategies did not pass the backtest gate. `breakout_20` was modestly positive on validation (+3.86% return, Sharpe 0.325) but negative on holdout (-9.22%, Sharpe -1.523). `funding_contrarian` was nearly flat on holdout (+0.04%, Sharpe 0.028); always-long and momentum were negative on both segments.
+
+No barrier candidate passed the pre-holdout selection rule. Although several BTCUSDT variants exceeded their always-long mean net R, the highest `folds_with_positive_mean_r` was 3 of 5. ETHUSDT also peaked at 3 of 5, below the required 4, so no candidate qualifies across both symbols. The strongest BTCUSDT mean net R was 0.351 at horizon 12 / TP 4 ATR, but it passed only 2 folds; the strongest ETHUSDT mean net R among risk-floor candidates was 0.049 at horizon 12 / TP 4 ATR, also only 2 folds. The barrier holdout backtest was therefore not run, as required by the protocol. Do not promote or enable barrier predictions from these results.
+
 ### Candidate experiment results (2026-10-04)
 
 The best tested CV variant by balanced accuracy was `flat_atr_mult=0.5` with balanced classifiers: balanced accuracy 0.379 for BTCUSDT and 0.366 for ETHUSDT. Directional high-confidence precision was only 15.5% and 20.4%, respectively, at 1.95% and 1.23% coverage, so the classification improvement is weak.

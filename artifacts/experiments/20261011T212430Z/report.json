@@ -1,0 +1,1785 @@
+{
+  "symbols": {
+    "BTCUSDT": [
+      {
+        "flat_atr_mult": 0.5,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 1.0038645357657745,
+          "accuracy": 0.5808786640865764,
+          "balanced_accuracy": 0.3596047660738246,
+          "oos_class_counts": {
+            "short": 2497,
+            "flat": 8768,
+            "long": 2688
+          },
+          "oos_predicted_class_counts": {
+            "short": 1378,
+            "flat": 11663,
+            "long": 912
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 297,
+                "flat": 922,
+                "long": 269
+              },
+              "test_class_counts": {
+                "short": 427,
+                "flat": 1771,
+                "long": 592
+              },
+              "predicted_test_class_counts": {
+                "short": 369,
+                "flat": 2391,
+                "long": 30
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 727,
+                "flat": 2689,
+                "long": 862
+              },
+              "test_class_counts": {
+                "short": 540,
+                "flat": 1761,
+                "long": 489
+              },
+              "predicted_test_class_counts": {
+                "short": 119,
+                "flat": 2556,
+                "long": 115
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 1267,
+                "flat": 4456,
+                "long": 1345
+              },
+              "test_class_counts": {
+                "short": 421,
+                "flat": 1821,
+                "long": 548
+              },
+              "predicted_test_class_counts": {
+                "short": 449,
+                "flat": 1791,
+                "long": 550
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 1686,
+                "flat": 6274,
+                "long": 1898
+              },
+              "test_class_counts": {
+                "short": 530,
+                "flat": 1709,
+                "long": 551
+              },
+              "predicted_test_class_counts": {
+                "short": 42,
+                "flat": 2650,
+                "long": 98
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 2219,
+                "flat": 7980,
+                "long": 2449
+              },
+              "test_class_counts": {
+                "short": 579,
+                "flat": 1706,
+                "long": 508
+              },
+              "predicted_test_class_counts": {
+                "short": 399,
+                "flat": 2275,
+                "long": 119
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.23439767779390422,
+              "recall": 0.12935522627152582,
+              "support": 2497
+            },
+            "flat": {
+              "precision": 0.6466603789762497,
+              "recall": 0.8601733576642335,
+              "support": 8768
+            },
+            "long": {
+              "precision": 0.2631578947368421,
+              "recall": 0.08928571428571429,
+              "support": 2688
+            }
+          },
+          "hc_coverage": 0.2878234071525837,
+          "hc_precision": 0.665089641434263,
+          "directional_prediction_rate": 0.16412241095104996,
+          "directional_hc_coverage": 0.009316992761413316,
+          "directional_hc_precision": 0.2230769230769231,
+          "directional_signal_coverage": 0.00924532358632552,
+          "directional_signal_precision": 0.21705426356589147,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      },
+      {
+        "flat_atr_mult": 0.5,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 1.074565992252781,
+          "accuracy": 0.473804916505411,
+          "balanced_accuracy": 0.3694097563409077,
+          "oos_class_counts": {
+            "short": 2497,
+            "flat": 8768,
+            "long": 2688
+          },
+          "oos_predicted_class_counts": {
+            "short": 3805,
+            "flat": 8000,
+            "long": 2148
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 297,
+                "flat": 922,
+                "long": 269
+              },
+              "test_class_counts": {
+                "short": 427,
+                "flat": 1771,
+                "long": 592
+              },
+              "predicted_test_class_counts": {
+                "short": 518,
+                "flat": 2171,
+                "long": 101
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 727,
+                "flat": 2689,
+                "long": 862
+              },
+              "test_class_counts": {
+                "short": 540,
+                "flat": 1761,
+                "long": 489
+              },
+              "predicted_test_class_counts": {
+                "short": 513,
+                "flat": 1874,
+                "long": 403
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 1267,
+                "flat": 4456,
+                "long": 1345
+              },
+              "test_class_counts": {
+                "short": 421,
+                "flat": 1821,
+                "long": 548
+              },
+              "predicted_test_class_counts": {
+                "short": 1200,
+                "flat": 815,
+                "long": 775
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 1686,
+                "flat": 6274,
+                "long": 1898
+              },
+              "test_class_counts": {
+                "short": 530,
+                "flat": 1709,
+                "long": 551
+              },
+              "predicted_test_class_counts": {
+                "short": 360,
+                "flat": 2107,
+                "long": 323
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 2219,
+                "flat": 7980,
+                "long": 2449
+              },
+              "test_class_counts": {
+                "short": 579,
+                "flat": 1706,
+                "long": 508
+              },
+              "predicted_test_class_counts": {
+                "short": 1214,
+                "flat": 1033,
+                "long": 546
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.20289093298291722,
+              "recall": 0.3091710052062475,
+              "support": 2497
+            },
+            "flat": {
+              "precision": 0.665375,
+              "recall": 0.6070939781021898,
+              "support": 8768
+            },
+            "long": {
+              "precision": 0.24022346368715083,
+              "recall": 0.19196428571428573,
+              "support": 2688
+            }
+          },
+          "hc_coverage": 0.12233928187486562,
+          "hc_precision": 0.6303456356180434,
+          "directional_prediction_rate": 0.4266465992976421,
+          "directional_hc_coverage": 0.0163405719200172,
+          "directional_hc_precision": 0.2719298245614035,
+          "directional_signal_coverage": 0.016268902744929405,
+          "directional_signal_precision": 0.2687224669603524,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      },
+      {
+        "flat_atr_mult": 1.0,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 0.5447739990895493,
+          "accuracy": 0.8359492582240379,
+          "balanced_accuracy": 0.33694398529005515,
+          "oos_class_counts": {
+            "short": 925,
+            "flat": 11908,
+            "long": 1120
+          },
+          "oos_predicted_class_counts": {
+            "short": 251,
+            "flat": 13591,
+            "long": 111
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 128,
+                "flat": 1221,
+                "long": 139
+              },
+              "test_class_counts": {
+                "short": 147,
+                "flat": 2418,
+                "long": 225
+              },
+              "predicted_test_class_counts": {
+                "short": 189,
+                "flat": 2600,
+                "long": 1
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 275,
+                "flat": 3639,
+                "long": 364
+              },
+              "test_class_counts": {
+                "short": 205,
+                "flat": 2393,
+                "long": 192
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2788,
+                "long": 2
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 481,
+                "flat": 6036,
+                "long": 551
+              },
+              "test_class_counts": {
+                "short": 164,
+                "flat": 2335,
+                "long": 291
+              },
+              "predicted_test_class_counts": {
+                "short": 52,
+                "flat": 2667,
+                "long": 71
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 645,
+                "flat": 8366,
+                "long": 847
+              },
+              "test_class_counts": {
+                "short": 185,
+                "flat": 2391,
+                "long": 214
+              },
+              "predicted_test_class_counts": {
+                "short": 3,
+                "flat": 2766,
+                "long": 21
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 830,
+                "flat": 10757,
+                "long": 1061
+              },
+              "test_class_counts": {
+                "short": 224,
+                "flat": 2371,
+                "long": 198
+              },
+              "predicted_test_class_counts": {
+                "short": 7,
+                "flat": 2770,
+                "long": 16
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.06374501992031872,
+              "recall": 0.017297297297297298,
+              "support": 925
+            },
+            "flat": {
+              "precision": 0.8556397616069458,
+              "recall": 0.9765703728585825,
+              "support": 11908
+            },
+            "long": {
+              "precision": 0.17117117117117117,
+              "recall": 0.016964285714285713,
+              "support": 1120
+            }
+          },
+          "hc_coverage": 0.8316491077187702,
+          "hc_precision": 0.8721992416408135,
+          "directional_prediction_rate": 0.025944241381781696,
+          "directional_hc_coverage": 0.0022934136028094315,
+          "directional_hc_precision": 0.03125,
+          "directional_signal_coverage": 0.0022934136028094315,
+          "directional_signal_precision": 0.03125,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      },
+      {
+        "flat_atr_mult": 1.0,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 0.665798483266036,
+          "accuracy": 0.7581882032537806,
+          "balanced_accuracy": 0.3698817472998695,
+          "oos_class_counts": {
+            "short": 925,
+            "flat": 11908,
+            "long": 1120
+          },
+          "oos_predicted_class_counts": {
+            "short": 1104,
+            "flat": 11914,
+            "long": 935
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 128,
+                "flat": 1221,
+                "long": 139
+              },
+              "test_class_counts": {
+                "short": 147,
+                "flat": 2418,
+                "long": 225
+              },
+              "predicted_test_class_counts": {
+                "short": 322,
+                "flat": 2459,
+                "long": 9
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 275,
+                "flat": 3639,
+                "long": 364
+              },
+              "test_class_counts": {
+                "short": 205,
+                "flat": 2393,
+                "long": 192
+              },
+              "predicted_test_class_counts": {
+                "short": 2,
+                "flat": 2768,
+                "long": 20
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 481,
+                "flat": 6036,
+                "long": 551
+              },
+              "test_class_counts": {
+                "short": 164,
+                "flat": 2335,
+                "long": 291
+              },
+              "predicted_test_class_counts": {
+                "short": 380,
+                "flat": 1891,
+                "long": 519
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 645,
+                "flat": 8366,
+                "long": 847
+              },
+              "test_class_counts": {
+                "short": 185,
+                "flat": 2391,
+                "long": 214
+              },
+              "predicted_test_class_counts": {
+                "short": 85,
+                "flat": 2513,
+                "long": 192
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 830,
+                "flat": 10757,
+                "long": 1061
+              },
+              "test_class_counts": {
+                "short": 224,
+                "flat": 2371,
+                "long": 198
+              },
+              "predicted_test_class_counts": {
+                "short": 315,
+                "flat": 2283,
+                "long": 195
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.10326086956521739,
+              "recall": 0.12324324324324325,
+              "support": 925
+            },
+            "flat": {
+              "precision": 0.8672150411280846,
+              "recall": 0.8676519986563654,
+              "support": 11908
+            },
+            "long": {
+              "precision": 0.14224598930481283,
+              "recall": 0.11875,
+              "support": 1120
+            }
+          },
+          "hc_coverage": 0.4566043144843403,
+          "hc_precision": 0.8656411866269031,
+          "directional_prediction_rate": 0.14613344800401348,
+          "directional_hc_coverage": 0.015767218519314844,
+          "directional_hc_precision": 0.07727272727272727,
+          "directional_signal_coverage": 0.015480541818963663,
+          "directional_signal_precision": 0.07407407407407407,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      },
+      {
+        "flat_atr_mult": 1.5,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 0.29944667778660233,
+          "accuracy": 0.9302658926395757,
+          "balanced_accuracy": 0.3364982966903895,
+          "oos_class_counts": {
+            "short": 390,
+            "flat": 13061,
+            "long": 502
+          },
+          "oos_predicted_class_counts": {
+            "short": 50,
+            "flat": 13849,
+            "long": 54
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 54,
+                "flat": 1381,
+                "long": 53
+              },
+              "test_class_counts": {
+                "short": 45,
+                "flat": 2651,
+                "long": 94
+              },
+              "predicted_test_class_counts": {
+                "short": 40,
+                "flat": 2750,
+                "long": 0
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 99,
+                "flat": 4032,
+                "long": 147
+              },
+              "test_class_counts": {
+                "short": 112,
+                "flat": 2595,
+                "long": 83
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2790,
+                "long": 0
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 211,
+                "flat": 6627,
+                "long": 230
+              },
+              "test_class_counts": {
+                "short": 65,
+                "flat": 2574,
+                "long": 151
+              },
+              "predicted_test_class_counts": {
+                "short": 4,
+                "flat": 2748,
+                "long": 38
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 276,
+                "flat": 9201,
+                "long": 381
+              },
+              "test_class_counts": {
+                "short": 82,
+                "flat": 2617,
+                "long": 91
+              },
+              "predicted_test_class_counts": {
+                "short": 2,
+                "flat": 2787,
+                "long": 1
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 358,
+                "flat": 11818,
+                "long": 472
+              },
+              "test_class_counts": {
+                "short": 86,
+                "flat": 2624,
+                "long": 83
+              },
+              "predicted_test_class_counts": {
+                "short": 4,
+                "flat": 2774,
+                "long": 15
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.08,
+              "recall": 0.010256410256410256,
+              "support": 390
+            },
+            "flat": {
+              "precision": 0.9367463354754856,
+              "recall": 0.9932623841972283,
+              "support": 13061
+            },
+            "long": {
+              "precision": 0.05555555555555555,
+              "recall": 0.00597609561752988,
+              "support": 502
+            }
+          },
+          "hc_coverage": 0.9521966602164409,
+          "hc_precision": 0.9399367755532139,
+          "directional_prediction_rate": 0.007453594209130653,
+          "directional_hc_coverage": 0.00021500752526338422,
+          "directional_hc_precision": 0.0,
+          "directional_signal_coverage": 0.00014333835017558947,
+          "directional_signal_precision": 0.0,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      },
+      {
+        "flat_atr_mult": 1.5,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 0.3733477660768885,
+          "accuracy": 0.9023149143553357,
+          "balanced_accuracy": 0.34422344649763587,
+          "oos_class_counts": {
+            "short": 390,
+            "flat": 13061,
+            "long": 502
+          },
+          "oos_predicted_class_counts": {
+            "short": 298,
+            "flat": 13389,
+            "long": 266
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 54,
+                "flat": 1381,
+                "long": 53
+              },
+              "test_class_counts": {
+                "short": 45,
+                "flat": 2651,
+                "long": 94
+              },
+              "predicted_test_class_counts": {
+                "short": 107,
+                "flat": 2682,
+                "long": 1
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4278,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 99,
+                "flat": 4032,
+                "long": 147
+              },
+              "test_class_counts": {
+                "short": 112,
+                "flat": 2595,
+                "long": 83
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2786,
+                "long": 4
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 7068,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 211,
+                "flat": 6627,
+                "long": 230
+              },
+              "test_class_counts": {
+                "short": 65,
+                "flat": 2574,
+                "long": 151
+              },
+              "predicted_test_class_counts": {
+                "short": 129,
+                "flat": 2535,
+                "long": 126
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9858,
+              "n_test": 2790,
+              "train_class_counts": {
+                "short": 276,
+                "flat": 9201,
+                "long": 381
+              },
+              "test_class_counts": {
+                "short": 82,
+                "flat": 2617,
+                "long": 91
+              },
+              "predicted_test_class_counts": {
+                "short": 14,
+                "flat": 2713,
+                "long": 63
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12648,
+              "n_test": 2793,
+              "train_class_counts": {
+                "short": 358,
+                "flat": 11818,
+                "long": 472
+              },
+              "test_class_counts": {
+                "short": 86,
+                "flat": 2624,
+                "long": 83
+              },
+              "predicted_test_class_counts": {
+                "short": 48,
+                "flat": 2673,
+                "long": 72
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.0436241610738255,
+              "recall": 0.03333333333333333,
+              "support": 390
+            },
+            "flat": {
+              "precision": 0.9379341250280081,
+              "recall": 0.961488400581885,
+              "support": 13061
+            },
+            "long": {
+              "precision": 0.07142857142857142,
+              "recall": 0.037848605577689244,
+              "support": 502
+            }
+          },
+          "hc_coverage": 0.7459327743137677,
+          "hc_precision": 0.9440814757878555,
+          "directional_prediction_rate": 0.04042141474951624,
+          "directional_hc_coverage": 0.006306887407725937,
+          "directional_hc_precision": 0.06818181818181818,
+          "directional_signal_coverage": 0.006091879882462553,
+          "directional_signal_precision": 0.07058823529411765,
+          "ret_corr": 0.04366265091657166,
+          "n_oos": 13953
+        }
+      }
+    ],
+    "ETHUSDT": [
+      {
+        "flat_atr_mult": 0.5,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 1.0191307747963783,
+          "accuracy": 0.5677500742059959,
+          "balanced_accuracy": 0.347793860317761,
+          "oos_class_counts": {
+            "short": 2476,
+            "flat": 8273,
+            "long": 2727
+          },
+          "oos_predicted_class_counts": {
+            "short": 732,
+            "flat": 11443,
+            "long": 1301
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 223,
+                "flat": 908,
+                "long": 357
+              },
+              "test_class_counts": {
+                "short": 449,
+                "flat": 1578,
+                "long": 668
+              },
+              "predicted_test_class_counts": {
+                "short": 40,
+                "flat": 2413,
+                "long": 242
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 672,
+                "flat": 2493,
+                "long": 1018
+              },
+              "test_class_counts": {
+                "short": 547,
+                "flat": 1628,
+                "long": 520
+              },
+              "predicted_test_class_counts": {
+                "short": 56,
+                "flat": 1874,
+                "long": 765
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 1213,
+                "flat": 4123,
+                "long": 1542
+              },
+              "test_class_counts": {
+                "short": 434,
+                "flat": 1724,
+                "long": 537
+              },
+              "predicted_test_class_counts": {
+                "short": 125,
+                "flat": 2440,
+                "long": 130
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 1653,
+                "flat": 5839,
+                "long": 2081
+              },
+              "test_class_counts": {
+                "short": 510,
+                "flat": 1696,
+                "long": 489
+              },
+              "predicted_test_class_counts": {
+                "short": 382,
+                "flat": 2267,
+                "long": 46
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 2163,
+                "flat": 7539,
+                "long": 2566
+              },
+              "test_class_counts": {
+                "short": 536,
+                "flat": 1647,
+                "long": 513
+              },
+              "predicted_test_class_counts": {
+                "short": 129,
+                "flat": 2449,
+                "long": 118
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.23770491803278687,
+              "recall": 0.07027463651050081,
+              "support": 2476
+            },
+            "flat": {
+              "precision": 0.6287686795420782,
+              "recall": 0.8696966034086788,
+              "support": 8273
+            },
+            "long": {
+              "precision": 0.2167563412759416,
+              "recall": 0.1034103410341034,
+              "support": 2727
+            }
+          },
+          "hc_coverage": 0.22981596913030572,
+          "hc_precision": 0.656441717791411,
+          "directional_prediction_rate": 0.1508607895517958,
+          "directional_hc_coverage": 0.0024487978628673196,
+          "directional_hc_precision": 0.09090909090909091,
+          "directional_signal_coverage": 0.0024487978628673196,
+          "directional_signal_precision": 0.09090909090909091,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      },
+      {
+        "flat_atr_mult": 0.5,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 1.0723285974461034,
+          "accuracy": 0.46861086375779165,
+          "balanced_accuracy": 0.3561738392497055,
+          "oos_class_counts": {
+            "short": 2476,
+            "flat": 8273,
+            "long": 2727
+          },
+          "oos_predicted_class_counts": {
+            "short": 2528,
+            "flat": 7996,
+            "long": 2952
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 223,
+                "flat": 908,
+                "long": 357
+              },
+              "test_class_counts": {
+                "short": 449,
+                "flat": 1578,
+                "long": 668
+              },
+              "predicted_test_class_counts": {
+                "short": 147,
+                "flat": 2081,
+                "long": 467
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 672,
+                "flat": 2493,
+                "long": 1018
+              },
+              "test_class_counts": {
+                "short": 547,
+                "flat": 1628,
+                "long": 520
+              },
+              "predicted_test_class_counts": {
+                "short": 196,
+                "flat": 1127,
+                "long": 1372
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 1213,
+                "flat": 4123,
+                "long": 1542
+              },
+              "test_class_counts": {
+                "short": 434,
+                "flat": 1724,
+                "long": 537
+              },
+              "predicted_test_class_counts": {
+                "short": 478,
+                "flat": 1867,
+                "long": 350
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 1653,
+                "flat": 5839,
+                "long": 2081
+              },
+              "test_class_counts": {
+                "short": 510,
+                "flat": 1696,
+                "long": 489
+              },
+              "predicted_test_class_counts": {
+                "short": 932,
+                "flat": 1560,
+                "long": 203
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 2163,
+                "flat": 7539,
+                "long": 2566
+              },
+              "test_class_counts": {
+                "short": 536,
+                "flat": 1647,
+                "long": 513
+              },
+              "predicted_test_class_counts": {
+                "short": 775,
+                "flat": 1361,
+                "long": 560
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.22626582278481014,
+              "recall": 0.2310177705977383,
+              "support": 2476
+            },
+            "flat": {
+              "precision": 0.6453226613306653,
+              "recall": 0.6237157016801644,
+              "support": 8273
+            },
+            "long": {
+              "precision": 0.19749322493224933,
+              "recall": 0.2137880454712138,
+              "support": 2727
+            }
+          },
+          "hc_coverage": 0.0719798159691303,
+          "hc_precision": 0.6,
+          "directional_prediction_rate": 0.406648857227664,
+          "directional_hc_coverage": 0.010388839418224993,
+          "directional_hc_precision": 0.15714285714285714,
+          "directional_signal_coverage": 0.010388839418224993,
+          "directional_signal_precision": 0.15714285714285714,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      },
+      {
+        "flat_atr_mult": 1.0,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 0.5516591483527904,
+          "accuracy": 0.8452062926684476,
+          "balanced_accuracy": 0.3434007677183016,
+          "oos_class_counts": {
+            "short": 887,
+            "flat": 11577,
+            "long": 1012
+          },
+          "oos_predicted_class_counts": {
+            "short": 226,
+            "flat": 13164,
+            "long": 86
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 80,
+                "flat": 1269,
+                "long": 139
+              },
+              "test_class_counts": {
+                "short": 128,
+                "flat": 2362,
+                "long": 205
+              },
+              "predicted_test_class_counts": {
+                "short": 1,
+                "flat": 2687,
+                "long": 7
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 208,
+                "flat": 3634,
+                "long": 341
+              },
+              "test_class_counts": {
+                "short": 210,
+                "flat": 2293,
+                "long": 192
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2620,
+                "long": 75
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 413,
+                "flat": 5929,
+                "long": 536
+              },
+              "test_class_counts": {
+                "short": 170,
+                "flat": 2294,
+                "long": 231
+              },
+              "predicted_test_class_counts": {
+                "short": 62,
+                "flat": 2631,
+                "long": 2
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 588,
+                "flat": 8218,
+                "long": 767
+              },
+              "test_class_counts": {
+                "short": 199,
+                "flat": 2311,
+                "long": 185
+              },
+              "predicted_test_class_counts": {
+                "short": 162,
+                "flat": 2532,
+                "long": 1
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 787,
+                "flat": 10535,
+                "long": 946
+              },
+              "test_class_counts": {
+                "short": 180,
+                "flat": 2317,
+                "long": 199
+              },
+              "predicted_test_class_counts": {
+                "short": 1,
+                "flat": 2694,
+                "long": 1
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.15486725663716813,
+              "recall": 0.03945885005636979,
+              "support": 887
+            },
+            "flat": {
+              "precision": 0.8617441507140686,
+              "recall": 0.9798738878811436,
+              "support": 11577
+            },
+            "long": {
+              "precision": 0.12790697674418605,
+              "recall": 0.010869565217391304,
+              "support": 1012
+            }
+          },
+          "hc_coverage": 0.8222766399525082,
+          "hc_precision": 0.8728454110639834,
+          "directional_prediction_rate": 0.02315227070347284,
+          "directional_hc_coverage": 0.0002226179875333927,
+          "directional_hc_precision": 0.0,
+          "directional_signal_coverage": 0.0002226179875333927,
+          "directional_signal_precision": 0.0,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      },
+      {
+        "flat_atr_mult": 1.0,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 0.6626596944307768,
+          "accuracy": 0.7662511130899377,
+          "balanced_accuracy": 0.3669577024227624,
+          "oos_class_counts": {
+            "short": 887,
+            "flat": 11577,
+            "long": 1012
+          },
+          "oos_predicted_class_counts": {
+            "short": 1091,
+            "flat": 11610,
+            "long": 775
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 80,
+                "flat": 1269,
+                "long": 139
+              },
+              "test_class_counts": {
+                "short": 128,
+                "flat": 2362,
+                "long": 205
+              },
+              "predicted_test_class_counts": {
+                "short": 14,
+                "flat": 2625,
+                "long": 56
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 208,
+                "flat": 3634,
+                "long": 341
+              },
+              "test_class_counts": {
+                "short": 210,
+                "flat": 2293,
+                "long": 192
+              },
+              "predicted_test_class_counts": {
+                "short": 9,
+                "flat": 2411,
+                "long": 275
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 413,
+                "flat": 5929,
+                "long": 536
+              },
+              "test_class_counts": {
+                "short": 170,
+                "flat": 2294,
+                "long": 231
+              },
+              "predicted_test_class_counts": {
+                "short": 312,
+                "flat": 2195,
+                "long": 188
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 588,
+                "flat": 8218,
+                "long": 767
+              },
+              "test_class_counts": {
+                "short": 199,
+                "flat": 2311,
+                "long": 185
+              },
+              "predicted_test_class_counts": {
+                "short": 570,
+                "flat": 2068,
+                "long": 57
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 787,
+                "flat": 10535,
+                "long": 946
+              },
+              "test_class_counts": {
+                "short": 180,
+                "flat": 2317,
+                "long": 199
+              },
+              "predicted_test_class_counts": {
+                "short": 186,
+                "flat": 2311,
+                "long": 199
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.1228230980751604,
+              "recall": 0.15107102593010147,
+              "support": 887
+            },
+            "flat": {
+              "precision": 0.8712316968130922,
+              "recall": 0.8737151248164464,
+              "support": 11577
+            },
+            "long": {
+              "precision": 0.09935483870967741,
+              "recall": 0.07608695652173914,
+              "support": 1012
+            }
+          },
+          "hc_coverage": 0.37563075096467796,
+          "hc_precision": 0.8836428289213749,
+          "directional_prediction_rate": 0.13846838824577026,
+          "directional_hc_coverage": 0.005342831700801425,
+          "directional_hc_precision": 0.1527777777777778,
+          "directional_signal_coverage": 0.005268625704956961,
+          "directional_signal_precision": 0.15492957746478872,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      },
+      {
+        "flat_atr_mult": 1.5,
+        "horizon_candles": 6,
+        "class_balance": false,
+        "metrics": {
+          "logloss": 0.2531946870011604,
+          "accuracy": 0.945161769070941,
+          "balanced_accuracy": 0.3330718338955571,
+          "oos_class_counts": {
+            "short": 362,
+            "flat": 12747,
+            "long": 367
+          },
+          "oos_predicted_class_counts": {
+            "short": 0,
+            "flat": 13466,
+            "long": 10
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 36,
+                "flat": 1381,
+                "long": 71
+              },
+              "test_class_counts": {
+                "short": 33,
+                "flat": 2599,
+                "long": 63
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2695,
+                "long": 0
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 69,
+                "flat": 3980,
+                "long": 134
+              },
+              "test_class_counts": {
+                "short": 94,
+                "flat": 2536,
+                "long": 65
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2685,
+                "long": 10
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 163,
+                "flat": 6516,
+                "long": 199
+              },
+              "test_class_counts": {
+                "short": 76,
+                "flat": 2531,
+                "long": 88
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2695,
+                "long": 0
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 239,
+                "flat": 9047,
+                "long": 287
+              },
+              "test_class_counts": {
+                "short": 87,
+                "flat": 2539,
+                "long": 69
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2695,
+                "long": 0
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 326,
+                "flat": 11589,
+                "long": 353
+              },
+              "test_class_counts": {
+                "short": 72,
+                "flat": 2542,
+                "long": 82
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2696,
+                "long": 0
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": null,
+              "recall": 0.0,
+              "support": 362
+            },
+            "flat": {
+              "precision": 0.9458636566166642,
+              "recall": 0.9992155016866714,
+              "support": 12747
+            },
+            "long": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 367
+            }
+          },
+          "hc_coverage": 0.9890175126150192,
+          "hc_precision": 0.9471038415366146,
+          "directional_prediction_rate": 0.0007420599584446423,
+          "directional_hc_coverage": 0.0,
+          "directional_hc_precision": null,
+          "directional_signal_coverage": 0.0,
+          "directional_signal_precision": null,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      },
+      {
+        "flat_atr_mult": 1.5,
+        "horizon_candles": 6,
+        "class_balance": true,
+        "metrics": {
+          "logloss": 0.30611996430938415,
+          "accuracy": 0.931433659839715,
+          "balanced_accuracy": 0.344187439748461,
+          "oos_class_counts": {
+            "short": 362,
+            "flat": 12747,
+            "long": 367
+          },
+          "oos_predicted_class_counts": {
+            "short": 89,
+            "flat": 13231,
+            "long": 156
+          },
+          "cv_folds": [
+            {
+              "fold": 1,
+              "n_train": 1488,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 36,
+                "flat": 1381,
+                "long": 71
+              },
+              "test_class_counts": {
+                "short": 33,
+                "flat": 2599,
+                "long": 63
+              },
+              "predicted_test_class_counts": {
+                "short": 2,
+                "flat": 2687,
+                "long": 6
+              }
+            },
+            {
+              "fold": 2,
+              "n_train": 4183,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 69,
+                "flat": 3980,
+                "long": 134
+              },
+              "test_class_counts": {
+                "short": 94,
+                "flat": 2536,
+                "long": 65
+              },
+              "predicted_test_class_counts": {
+                "short": 0,
+                "flat": 2637,
+                "long": 58
+              }
+            },
+            {
+              "fold": 3,
+              "n_train": 6878,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 163,
+                "flat": 6516,
+                "long": 199
+              },
+              "test_class_counts": {
+                "short": 76,
+                "flat": 2531,
+                "long": 88
+              },
+              "predicted_test_class_counts": {
+                "short": 57,
+                "flat": 2586,
+                "long": 52
+              }
+            },
+            {
+              "fold": 4,
+              "n_train": 9573,
+              "n_test": 2695,
+              "train_class_counts": {
+                "short": 239,
+                "flat": 9047,
+                "long": 287
+              },
+              "test_class_counts": {
+                "short": 87,
+                "flat": 2539,
+                "long": 69
+              },
+              "predicted_test_class_counts": {
+                "short": 10,
+                "flat": 2685,
+                "long": 0
+              }
+            },
+            {
+              "fold": 5,
+              "n_train": 12268,
+              "n_test": 2696,
+              "train_class_counts": {
+                "short": 326,
+                "flat": 11589,
+                "long": 353
+              },
+              "test_class_counts": {
+                "short": 72,
+                "flat": 2542,
+                "long": 82
+              },
+              "predicted_test_class_counts": {
+                "short": 20,
+                "flat": 2636,
+                "long": 40
+              }
+            }
+          ],
+          "per_class": {
+            "short": {
+              "precision": 0.06741573033707865,
+              "recall": 0.016574585635359115,
+              "support": 362
+            },
+            "flat": {
+              "precision": 0.9473206862671,
+              "recall": 0.9832901859261003,
+              "support": 12747
+            },
+            "long": {
+              "precision": 0.07692307692307693,
+              "recall": 0.0326975476839237,
+              "support": 367
+            }
+          },
+          "hc_coverage": 0.8213861680023746,
+          "hc_precision": 0.9541060619748848,
+          "directional_prediction_rate": 0.018180468981893738,
+          "directional_hc_coverage": 0.0010388839418224993,
+          "directional_hc_precision": 0.0,
+          "directional_signal_coverage": 0.0010388839418224993,
+          "directional_signal_precision": 0.0,
+          "ret_corr": 0.02060830137484146,
+          "n_oos": 13476
+        }
+      }
+    ]
+  },
+  "variants": []
+}

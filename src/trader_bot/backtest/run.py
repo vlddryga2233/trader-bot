@@ -63,6 +63,7 @@ def run_backtest(engine: Engine, cfg: StrategyConfig, out_dir: Path,
             "atr_stop_mult": cfg.risk.atr_stop_mult,
             "taker_fee": cfg.backtest.taker_fee,
             "slippage_bps": cfg.backtest.slippage_bps,
+            "params_by_symbol": params_by_symbol,
         },
     }
     portfolio.to_csv(out_dir / "equity.csv", header=["equity"])

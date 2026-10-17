@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field, SecretStr
@@ -76,6 +77,14 @@ class RiskCfg(BaseModel):
         )
 
 
+class BarrierCfg(BaseModel):
+    tp_atr_mult: float = Field(default=3.0, gt=0)
+    min_ev_r: float = Field(default=0.05, ge=0)
+    calib_frac: float = Field(default=0.2, gt=0, lt=0.5)
+    promotion_min_signals: int = Field(default=30, ge=1)
+    promotion_min_mean_r: float = 0.05
+
+
 class BacktestCfg(BaseModel):
     taker_fee: float = 0.0005
     slippage_bps: float = 2.0
@@ -92,10 +101,16 @@ class StrategyConfig(BaseModel):
     model: ModelCfg = ModelCfg()
     risk: RiskCfg = RiskCfg()
     backtest: BacktestCfg = BacktestCfg()
+    signal_mode: Literal["classic", "barrier"] = "classic"
+    barrier: BarrierCfg = BarrierCfg()
 
 
 def load_strategy(path: Path | str) -> StrategyConfig:
     data = yaml.safe_load(Path(path).read_text()) or {}
     cfg = StrategyConfig.model_validate(data)
     cfg.risk = cfg.risk.clamped()
+    if cfg.signal_mode == "barrier" and (
+        cfg.barrier.tp_atr_mult / cfg.risk.atr_stop_mult < cfg.risk.min_reward_risk
+    ):
+        raise ValueError("barrier.tp_atr_mult / risk.atr_stop_mult is below risk.min_reward_risk")
     return cfg

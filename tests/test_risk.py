@@ -5,7 +5,15 @@ import pytest
 
 from trader_bot.config.settings import RiskCfg, load_strategy
 from trader_bot.risk import limits
-from trader_bot.risk.engine import Rejection, Signal, TradePlan, make_signal, plan_trade
+from trader_bot.risk.engine import (
+    Rejection,
+    Signal,
+    TradePlan,
+    make_ev_signal,
+    make_signal,
+    plan_trade,
+    round_trip_cost,
+)
 from trader_bot.risk.kill_switch import KillSwitch
 
 CFG = RiskCfg(risk_per_trade=0.01, leverage=3, atr_stop_mult=2.0, min_reward_risk=1.0)
@@ -16,6 +24,33 @@ def test_signal_requires_confidence_and_agreeing_regressor():
     assert make_signal(0.05, 0.25, 0.70, 0.02, 0.75) is None       # low confidence
     assert make_signal(0.80, 0.15, 0.05, 0.02, 0.75) is None       # regressor disagrees
     assert make_signal(0.05, 0.90, 0.05, 0.0, 0.75) is None        # flat
+
+
+def test_ev_signal_long_when_expected_value_positive():
+    sig = make_ev_signal(0.5, 0.1, 100.0, 1.0, 2.0, 3.0, 0.0, 0.05)
+    assert sig is not None and sig.direction == 1
+    assert sig.pred_ret == pytest.approx(0.03)
+
+
+def test_ev_signal_none_when_expected_value_negative():
+    assert make_ev_signal(0.35, 0.1, 100.0, 1.0, 2.0, 3.0, 0.0, 0.05) is None
+
+
+def test_ev_signal_costs_can_veto():
+    assert make_ev_signal(0.44, 0.1, 100.0, 1.0, 2.0, 3.0, 0.0, 0.05) is not None
+    assert make_ev_signal(0.44, 0.1, 100.0, 1.0, 2.0, 3.0, 0.0014, 0.05) is None
+
+
+def test_ev_signal_short_side_and_plan_tp():
+    sig = make_ev_signal(0.1, 0.6, 100.0, 1.0, 2.0, 3.0, 0.0, 0.05)
+    assert sig.direction == -1
+    plan = plan_trade(sig, 10_000, 100.0, 1.0, RiskCfg(min_reward_risk=1.5))
+    assert not isinstance(plan, Rejection)
+    assert plan.take_profit == pytest.approx(97.0)
+
+
+def test_round_trip_cost():
+    assert round_trip_cost(0.0005, 2.0) == pytest.approx(0.0014)
 
 
 def test_position_size_risks_one_percent():
@@ -87,3 +122,11 @@ def test_kill_switch_lock_persists_until_reset(tmp_path):
 def test_strategy_yaml_loads_and_is_clamped(tmp_path):
     cfg = load_strategy("config/strategy.yaml")
     assert cfg.risk.leverage <= limits.MAX_LEVERAGE and cfg.symbols == ["BTCUSDT", "ETHUSDT"]
+
+
+def test_barrier_mode_rejects_tp_below_reward_risk_floor(tmp_path):
+    path = tmp_path / "s.yaml"
+    path.write_text("signal_mode: barrier\nbarrier: {tp_atr_mult: 2.0}\n"
+                    "risk: {atr_stop_mult: 2.0, min_reward_risk: 1.5}\n")
+    with pytest.raises(ValueError):
+        load_strategy(path)

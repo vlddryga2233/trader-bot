@@ -26,6 +26,17 @@ def test_registry_requires_directional_quality_before_first_promotion(tmp_path):
     )
 
 
+def test_registry_returns_params_of_promoted_model(tmp_path):
+    from trader_bot.models.ensemble import Ensemble
+
+    registry = ModelRegistry(tmp_path)
+    assert registry.current_params("BTCUSDT") is None
+    version = registry.save("BTCUSDT", Ensemble(["a"]), _metrics(),
+                            {"params": {"lgbm": {"num_leaves": 8}}})
+    registry.promote("BTCUSDT", version)
+    assert registry.current_params("BTCUSDT") == {"lgbm": {"num_leaves": 8}}
+
+
 def test_registry_compares_candidate_directional_quality(tmp_path):
     registry = ModelRegistry(tmp_path)
     model_dir = registry._dir("BTCUSDT")

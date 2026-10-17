@@ -13,6 +13,10 @@ uv run trader-bot init-db
 uv run trader-bot backfill      # klines, funding, OI/long-short metrics (data.binance.vision)
 uv run trader-bot train [--tune]
 uv run trader-bot backtest      # walk-forward OOS; gate: Sharpe > 1.5 and |MaxDD| < 15%
+# research
+uv run trader-bot baselines
+uv run trader-bot barrier-experiment --holdout-start 2025-10-01
+uv run trader-bot barrier-backtest --holdout-start 2025-10-01
 uv run trader-bot collect       # live collectors (run alongside; accumulates liquidations)
 uv run trader-bot run --testnet
 uv run trader-bot killswitch-reset   # manual unlock after a kill-switch event

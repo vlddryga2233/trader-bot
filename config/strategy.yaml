@@ -23,7 +23,7 @@ model:
   embargo_candles: 6
   cv_splits: 5
   min_train_candles: 1500
-  retrain_every_candles: 540   # backtest walk-forward / live weekly-ish
+  retrain_every_candles: 540   # backtest walk-forward retrain cadence (540 x 4h = 90 days); live retrains every 7 days
   optuna_trials: 30
 
 risk:                       # values are clamped to hard maximums in risk/limits.py
@@ -40,3 +40,11 @@ backtest:
   slippage_bps: 2.0
   initial_equity: 10000
   start: "2023-10-01"      # ~3 years of out-of-sample trading
+
+signal_mode: classic        # "barrier" = triple-barrier labels + expected-value signal (research)
+barrier:
+  tp_atr_mult: 3.0          # take-profit distance in ATR; must be >= atr_stop_mult * min_reward_risk
+  min_ev_r: 0.05            # trade only if expected value after costs >= this many R
+  calib_frac: 0.2           # most recent share of each training window used for calibration
+  promotion_min_signals: 30
+  promotion_min_mean_r: 0.05

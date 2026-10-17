@@ -6,14 +6,16 @@ is executed at the open of candle i. Stops are checked before targets within a b
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import pandas as pd
 
 from trader_bot.config.settings import BacktestCfg, RiskCfg
-from trader_bot.risk.engine import Rejection, make_signal, plan_trade
+from trader_bot.risk.engine import Rejection, Signal, make_signal, plan_trade
 
 BAR = pd.Timedelta(hours=4)
+SignalFn = Callable[[pd.Series, float, float], Signal | None]
 
 
 @dataclass
@@ -40,6 +42,7 @@ def simulate(
     horizon: int,
     initial_equity: float,
     diagnostics: dict | None = None,
+    signal_fn: SignalFn | None = None,
 ) -> tuple[pd.Series, pd.DataFrame]:
     fee, slip = bt.taker_fee, bt.slippage_bps / 10_000
     cash = initial_equity
@@ -95,23 +98,30 @@ def simulate(
                 or (week_anchor[1] - cash) / week_anchor[1] >= risk.weekly_loss_limit
             )
             row = preds.loc[t]
-            class_idx = [row["p_short"], row["p_flat"], row["p_long"]].index(
-                max(row["p_short"], row["p_flat"], row["p_long"])
-            )
-            class_name = ("short", "flat", "long")[class_idx]
-            diag["top_class_counts"][class_name] += 1
-            direction = (-1, 0, 1)[class_idx]
-            if direction != 0:
-                diag["directional_top_class"] += 1
-                if float(row[f"p_{class_name}"]) >= confidence_threshold:
-                    diag["confidence_pass"] += 1
-                    if float(row["pred_ret"]) * direction > 0:
-                        diag["return_agreement"] += 1
+            if signal_fn is None:
+                class_idx = [row["p_short"], row["p_flat"], row["p_long"]].index(
+                    max(row["p_short"], row["p_flat"], row["p_long"])
+                )
+                class_name = ("short", "flat", "long")[class_idx]
+                diag["top_class_counts"][class_name] += 1
+                direction = (-1, 0, 1)[class_idx]
+                if direction != 0:
+                    diag["directional_top_class"] += 1
+                    if float(row[f"p_{class_name}"]) >= confidence_threshold:
+                        diag["confidence_pass"] += 1
+                        if float(row["pred_ret"]) * direction > 0:
+                            diag["return_agreement"] += 1
             if halted:
                 diag["risk_halted"] += 1
-            sig = None if halted else make_signal(
-                row["p_short"], row["p_flat"], row["p_long"], row["pred_ret"], confidence_threshold
-            )
+            if halted:
+                sig = None
+            elif signal_fn is None:
+                sig = make_signal(
+                    row["p_short"], row["p_flat"], row["p_long"], row["pred_ret"],
+                    confidence_threshold,
+                )
+            else:
+                sig = signal_fn(row, float(bar["open"]), float(atr.loc[t]))
             if sig is not None:
                 diag["signal_pass"] += 1
                 entry = bar["open"] * (1 + sig.direction * slip)
@@ -137,7 +147,7 @@ def simulate(
                 gap = min(bar["open"], pos.stop) if pos.direction == 1 else max(bar["open"], pos.stop)
                 close_pos(gap * (1 - pos.direction * slip), close_t, "stop")
             elif hit_tp:
-                close_pos(pos.tp, close_t, "take_profit")
+                close_pos(pos.tp * (1 - pos.direction * slip), close_t, "take_profit")
             elif pos.bars >= horizon:
                 close_pos(bar["close"] * (1 - pos.direction * slip), close_t, "time")
 

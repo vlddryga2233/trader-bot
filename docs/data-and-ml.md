@@ -34,7 +34,7 @@ Rows are indexed by **decision time** = close of a 4h candle. Each source is com
 - **liquidations (optional):** historical total estimated USD and quantity over 4h/24h; long/short USD over 1/4/24h and imbalance only where side-labelled Binance events exist.
 - **onchain (optional):** raw value and 7-day change, shifted by `onchain_publication_lag_hours` before forward-fill.
 
-Columns prefixed `ctx_` (`ctx_close`, `ctx_atr`) are context for labeling/risk and are never model inputs. A test asserts features at time t are unchanged if all later data is removed.
+Columns prefixed `ctx_` (`ctx_close`, `ctx_atr`, `ctx_high`, `ctx_low`) are context for labeling/risk and are never model inputs. A test asserts features at time t are unchanged if all later data is removed.
 
 ## Labels (`labeling/labels.py`)
 
@@ -54,7 +54,15 @@ The last `h` rows have no label and are never used for training.
 - **Signal threshold study:** `uv run trader-bot signal-study --holdout-start 2025-10-01` reports actual/predicted class balance and probability distributions, searches confidence and minimum reward/risk grids on earlier validation predictions, then evaluates a selected pair on the final holdout. Selection requires at least 20 trades, positive validation Sharpe, profit factor above 1, and max drawdown below 15%; if none pass, the existing thresholds are reported as unvalidated. Validation labels whose horizon overlaps the holdout are purged. The study does not modify strategy settings or promote models.
 - **Registry:** each training run saves a versioned artifact. Promotion requires configurable CV floors for balanced accuracy, precision and coverage after both the confidence and return-agreement filters; a candidate must also improve the product of precision and coverage over the current model. This favors usable directional signals over majority-class logloss.
 - **Retraining:** the live loop retrains weekly; `train` does it on demand.
-- Not implemented: probability calibration.
+- Probability calibration is implemented only in barrier mode (isotonic, purged tail of each training window).
+
+## Barrier mode (research)
+
+Barrier mode is opt-in and `signal_mode: classic` remains the default. Triple-barrier labels measure realized outcomes in R units: the stop, fixed ATR take-profit, or time exit that occurs first. If stop and target are both inside one candle, the stop is counted first. Two binary LightGBM/CatBoost ensembles estimate the chance that long or short take-profit is hit first; isotonic calibration uses a purged tail of each training window.
+
+The EV rule chooses the side with the larger `EV = p·RR − (1−p) − cost_R`. Time exits are treated as full losses when computing EV, making the decision conservative. It trades only when expected value clears `barrier.min_ev_r`; the take-profit is fixed at `barrier.tp_atr_mult × ATR`.
+
+Use `trader-bot barrier-experiment` to compare horizon and target variants using pre-holdout data, then choose settings before a single `trader-bot barrier-backtest --holdout-start DATE` evaluation. `trader-bot baselines` compares simple rules under the same simulator and costs. These are research commands; do not select settings using holdout results.
 
 ## Signal rule
 
