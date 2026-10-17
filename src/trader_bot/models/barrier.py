@@ -115,6 +115,24 @@ def _calibration_table(y: np.ndarray, p: np.ndarray, bins: int = 10) -> list[dic
     return table.reset_index(drop=True).to_dict(orient="records")
 
 
+def non_overlapping(signal: np.ndarray, horizon: int) -> np.ndarray:
+    """Greedy mask: take a signal, then skip the next horizon-1 rows (one position at a time)."""
+    taken = np.zeros(len(signal), dtype=bool)
+    next_free = 0
+    for i in np.flatnonzero(signal):
+        if i >= next_free:
+            taken[i] = True
+            next_free = i + horizon
+    return taken
+
+
+def _t_stat(values: np.ndarray) -> float | None:
+    if len(values) < 2:
+        return None
+    sd = values.std(ddof=1)
+    return float(values.mean() / (sd / np.sqrt(len(values)))) if sd > 0 else None
+
+
 def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
                            y_short: pd.Series, r_long: pd.Series, r_short: pd.Series,
                            cfg: StrategyConfig) -> dict:
@@ -136,6 +154,8 @@ def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
     realized = np.where(direction == 1, rl, rs) - cost_r
     hits = np.where(direction == 1, yl, ys)
     n_signals = int(signal.sum())
+    trades = non_overlapping(signal, cfg.labeling.horizon_candles)
+    trade_r = realized[trades]
     return {
         "n_oos": len(P),
         "reward_risk": rr,
@@ -154,6 +174,9 @@ def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
         "signal_coverage": n_signals / len(P) if len(P) else 0.0,
         "hit_rate_on_signals": float(hits[signal].mean()) if n_signals else None,
         "mean_net_r_on_signals": float(realized[signal].mean()) if n_signals else None,
+        "n_trades_nonoverlap": int(trades.sum()),
+        "mean_net_r_nonoverlap": float(trade_r.mean()) if len(trade_r) else None,
+        "t_stat_nonoverlap": _t_stat(trade_r),
         "always_long_mean_net_r": float(np.mean(rl - cost_r)),
         "always_short_mean_net_r": float(np.mean(rs - cost_r)),
     }
@@ -181,19 +204,27 @@ def cv_evaluate_barrier(ds: BarrierDataset, cfg: StrategyConfig) -> dict:
                                               rl.iloc[te], rs.iloc[te], cfg)
         folds.append({
             "fold": fold, "n_train": len(tr), "n_test": len(te),
-            **{key: fold_metrics[key] for key in (
-                "auc_long", "auc_short", "n_signals", "hit_rate_on_signals",
-                "mean_net_r_on_signals")},
+            **{key: fold_metrics[key] for key in FOLD_KEYS},
         })
     P = pd.concat(preds)
     idx = P.index
     metrics = barrier_signal_metrics(P, X.loc[idx], yl.loc[idx], ys.loc[idx], rl.loc[idx],
                                      rs.loc[idx], cfg)
+    return summarize_folds(metrics, folds)
+
+
+FOLD_KEYS = ("auc_long", "auc_short", "n_signals", "hit_rate_on_signals",
+             "mean_net_r_on_signals", "n_trades_nonoverlap", "mean_net_r_nonoverlap")
+
+
+def summarize_folds(metrics: dict, folds: list[dict]) -> dict:
+    def positive(key: str) -> int:
+        return sum(1 for fold in folds if fold[key] is not None and fold[key] > 0)
+
     metrics["cv_folds"] = folds
-    metrics["folds_with_positive_mean_r"] = sum(
-        1 for fold in folds
-        if fold["mean_net_r_on_signals"] is not None and fold["mean_net_r_on_signals"] > 0
-    )
+    metrics["folds_with_positive_mean_r"] = positive("mean_net_r_on_signals")
+    metrics["folds_with_positive_nonoverlap_r"] = positive("mean_net_r_nonoverlap")
+    metrics["folds_with_signals"] = sum(1 for fold in folds if fold["n_signals"] > 0)
     return metrics
 
 

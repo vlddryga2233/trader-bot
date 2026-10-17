@@ -14,7 +14,9 @@ from trader_bot.models.barrier import build_barrier_dataset, cv_evaluate_barrier
 log = structlog.get_logger()
 SUMMARY_KEYS = ("reward_risk", "rr_meets_risk_floor", "auc_long", "auc_short", "n_signals",
                 "signal_coverage", "hit_rate_on_signals", "mean_net_r_on_signals",
-                "folds_with_positive_mean_r", "always_long_mean_net_r")
+                "folds_with_positive_mean_r", "always_long_mean_net_r",
+                "n_trades_nonoverlap", "mean_net_r_nonoverlap", "t_stat_nonoverlap",
+                "folds_with_positive_nonoverlap_r", "folds_with_signals")
 
 
 def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,

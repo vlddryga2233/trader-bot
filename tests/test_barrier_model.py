@@ -6,7 +6,9 @@ from trader_bot.models.barrier import (
     BARRIER_PRED_COLS,
     BarrierDataset,
     BarrierModel,
+    _t_stat,
     cv_evaluate_barrier,
+    non_overlapping,
 )
 
 
@@ -43,3 +45,20 @@ def test_cv_evaluate_barrier_reports_trading_metrics():
                 "folds_with_positive_mean_r", "calibration_long"):
         assert key in metrics
     assert metrics["auc_long"] > 0.6
+
+
+def test_non_overlapping_skips_rows_inside_holding_period():
+    signal = np.array([1, 1, 1, 0, 1, 1, 0, 0, 1], dtype=bool)
+    taken = non_overlapping(signal, horizon=3)
+    assert np.flatnonzero(taken).tolist() == [0, 4, 8]
+
+
+def test_non_overlapping_horizon_one_keeps_all():
+    signal = np.array([1, 0, 1, 1], dtype=bool)
+    assert non_overlapping(signal, 1).tolist() == signal.tolist()
+
+
+def test_t_stat():
+    assert _t_stat(np.array([1.0])) is None
+    assert _t_stat(np.array([1.0, 1.0])) is None
+    assert _t_stat(np.array([1.0, 2.0, 3.0])) > 3
