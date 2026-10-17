@@ -135,3 +135,33 @@ def test_metrics_asof_does_not_carry_stale_observations():
     out = derivatives_features(base, pd.DataFrame(), metrics)
     assert out.loc[base_idx[1], "oi_value"] == 100.0
     assert np.isnan(out.loc[base_idx[2], "oi_value"])
+
+
+def _build_all(k4, k1, kd, funding, metrics, liq, onchain, ref_k4):
+    groups = FeatureGroups(price=True, derivatives=True, cross_asset=True, calendar=True,
+                           derivs_extra=True)
+    return build_features(k4, k1, kd, funding, metrics, liq, onchain, groups, ref_k4=ref_k4)
+
+
+def test_new_feature_groups_present_and_leak_free():
+    inputs = _inputs()
+    ref = _klines("4h", N, 9)
+    full = _build_all(*inputs, ref)
+    for col in ("ref_ret_42", "rel_ret_42", "cal_hour", "cal_dow", "funding_z_30d",
+                "oi_px_div_24h", "oi_value_z_30d"):
+        assert col in full.columns
+    t = full.index[300]
+    k4, k1, kd, funding, metrics, liq, oc = inputs
+    cut = _build_all(
+        k4[k4.index + pd.Timedelta(hours=4) <= t],
+        k1[k1.index + pd.Timedelta(hours=1) <= t],
+        kd[kd.index + pd.Timedelta(days=1) <= t],
+        funding[funding.index <= t], metrics[metrics.index <= t], liq, oc,
+        ref[ref.index + pd.Timedelta(hours=4) <= t],
+    )
+    cols = model_columns(full)
+    pd.testing.assert_series_equal(full.loc[t, cols], cut.loc[t, cols], check_names=False)
+
+
+def test_new_groups_off_by_default_keep_columns_unchanged():
+    assert "cal_hour" not in _build(*_inputs()).columns

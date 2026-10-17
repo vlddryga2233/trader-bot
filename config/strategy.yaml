@@ -8,6 +8,9 @@ features:
     derivatives: true
     liquidations: false   # keep off unless same-data CV and backtest show an improvement
     onchain: false        # needs Glassnode / CryptoQuant key
+    cross_asset: false    # reference-symbol returns/volatility (BTC for ETH, ETH for BTC)
+    calendar: false       # decision hour and weekday
+    derivs_extra: false   # funding z-score, OI-price divergence, stationary OI/long-short
   onchain_publication_lag_hours: 24
 
 labeling:

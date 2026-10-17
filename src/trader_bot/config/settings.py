@@ -31,6 +31,9 @@ class FeatureGroups(BaseModel):
     derivatives: bool = True
     liquidations: bool = False
     onchain: bool = False
+    cross_asset: bool = False
+    calendar: bool = False
+    derivs_extra: bool = False
 
 
 class FeaturesCfg(BaseModel):

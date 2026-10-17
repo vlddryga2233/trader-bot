@@ -239,6 +239,45 @@ def onchain_features(base: pd.DataFrame, onchain: pd.DataFrame, lag_hours: int) 
     return _asof(base, feats)
 
 
+def cross_asset_features(base: pd.DataFrame, ref_k4: pd.DataFrame) -> pd.DataFrame:
+    """Reference-symbol 4h returns/volatility, available only after the reference candle closes."""
+    if ref_k4.empty:
+        return base
+    lc = np.log(ref_k4["close"])
+    r = pd.DataFrame(index=ref_k4.index)
+    for n in (1, 6, 42):
+        r[f"ref_ret_{n}"] = lc.diff(n)
+    r["ref_vol_42"] = lc.diff().rolling(42).std()
+    out = _asof(base, _stamp_closed(r, PRIMARY), tolerance=PRIMARY)
+    out["rel_ret_42"] = out["ret_42"] - out["ref_ret_42"]
+    return out
+
+
+def calendar_features(base: pd.DataFrame) -> pd.DataFrame:
+    out = base.copy()
+    out["cal_hour"] = out.index.hour
+    out["cal_dow"] = out.index.dayofweek
+    return out
+
+
+def derivs_extra_features(base: pd.DataFrame, funding: pd.DataFrame) -> pd.DataFrame:
+    """Needs derivatives columns; computed on the 4h decision grid, trailing only."""
+    out = base
+    if not funding.empty:
+        rate = funding["rate"]
+        z = (rate - rate.rolling(90).mean()) / rate.rolling(90).std()
+        out = _asof(out, pd.DataFrame({"funding_z_30d": z}))
+    out = out.copy()
+    if "oi_chg_24h" in out:
+        out["oi_px_div_24h"] = out["oi_chg_24h"] - (np.exp(out["ret_6"]) - 1)
+    for col in ("oi_value", "top_ls_accounts", "top_ls_positions", "global_ls"):
+        if col in out:
+            mean = out[col].rolling(180, min_periods=90).mean()
+            std = out[col].rolling(180, min_periods=90).std()
+            out[f"{col}_z_30d"] = (out[col] - mean) / std.replace(0, np.nan)
+    return out
+
+
 def build_features(
     k4: pd.DataFrame,
     k1: pd.DataFrame,
@@ -249,6 +288,7 @@ def build_features(
     onchain: pd.DataFrame,
     groups: FeatureGroups,
     lag_hours: int = 24,
+    ref_k4: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Index = decision time (candle close). Columns prefixed 'ctx_' are not model inputs."""
     feats = price_features(k4, k1, kd)
@@ -258,6 +298,12 @@ def build_features(
         feats = liquidation_features(feats, liquidations)
     if groups.onchain:
         feats = onchain_features(feats, onchain, lag_hours)
+    if groups.derivatives and groups.derivs_extra:
+        feats = derivs_extra_features(feats, funding)
+    if groups.cross_asset and ref_k4 is not None:
+        feats = cross_asset_features(feats, ref_k4)
+    if groups.calendar:
+        feats = calendar_features(feats)
     feats.index.name = "decision_time"
     return feats
 

@@ -24,11 +24,19 @@ def load_raw(engine: Engine, symbol: str) -> dict[str, pd.DataFrame]:
     }
 
 
+def reference_symbol(symbol: str) -> str:
+    return "ETHUSDT" if symbol == "BTCUSDT" else "BTCUSDT"
+
+
 def features_for_symbol(engine: Engine, symbol: str, cfg: StrategyConfig) -> tuple[pd.DataFrame, dict]:
     raw = load_raw(engine, symbol)
+    ref_k4 = None
+    if cfg.features.groups.cross_asset:
+        ref_k4 = store.load_frame(engine, schema.klines, "open_time", reference_symbol(symbol),
+                                  extra={"interval": "4h"})
     feats = build_features(
         raw["k4"], raw["k1"], raw["kd"], raw["funding"], raw["metrics"],
         raw["liquidations"], raw["onchain"], cfg.features.groups,
-        cfg.features.onchain_publication_lag_hours,
+        cfg.features.onchain_publication_lag_hours, ref_k4=ref_k4,
     )
     return feats, raw
