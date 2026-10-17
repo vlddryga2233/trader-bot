@@ -24,7 +24,17 @@ def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,
                            holdout_start: pd.Timestamp, tp_atr_mults: list[float],
                            horizons: list[int], pooled: bool = False) -> dict:
     """Grid barrier variants using only pre-holdout rows for model selection."""
-    report: dict = {"holdout_start": str(holdout_start), "symbols": {}, "pooled": pooled}
+    report: dict = {
+        "holdout_start": str(holdout_start),
+        "symbols": {},
+        "pooled": pooled,
+        "settings": {
+            "feature_groups": cfg.features.groups.model_dump(),
+            "model_size": cfg.barrier.model_size,
+            "taker_fee": cfg.backtest.taker_fee,
+            "slippage_bps": cfg.backtest.slippage_bps,
+        },
+    }
     if pooled:
         features = {}
         for symbol in cfg.symbols:

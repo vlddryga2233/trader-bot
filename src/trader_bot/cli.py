@@ -220,6 +220,13 @@ def barrier_experiment(
     tp_atr_mults: str = typer.Option("2.0,3.0,4.0", help="Comma-separated take-profit ATR mults"),
     horizons: str = typer.Option("3,6,12", help="Comma-separated horizons in candles"),
     pooled: bool = typer.Option(False, "--pooled", help="Train one model on all symbols"),
+    feature_groups: str = typer.Option(
+        "", help="Comma-separated extra feature groups to enable: cross_asset,calendar,derivs_extra"
+    ),
+    model_size: str = typer.Option("default", help="default or small"),
+    taker_fee: float | None = typer.Option(
+        None, help="What-if fee for cost sensitivity (report only; never used for selection)"
+    ),
 ) -> None:
     """Purged-CV grid for barrier labels + EV rule, using only pre-holdout data."""
     import pandas as pd
@@ -234,6 +241,17 @@ def barrier_experiment(
         raise typer.BadParameter("use comma-separated numbers") from exc
     if any(value <= 0 for value in tps) or any(value <= 0 for value in hs):
         raise typer.BadParameter("values must be positive")
+    allowed = {"cross_asset", "calendar", "derivs_extra"}
+    extra = {group.strip() for group in feature_groups.split(",") if group.strip()}
+    if not extra <= allowed:
+        raise typer.BadParameter(f"feature groups must be in {sorted(allowed)}")
+    if model_size not in ("default", "small"):
+        raise typer.BadParameter("model_size must be default or small")
+    groups = cfg.features.groups.model_copy(update={group: True for group in extra})
+    cfg.features = cfg.features.model_copy(update={"groups": groups})
+    cfg.barrier = cfg.barrier.model_copy(update={"model_size": model_size})
+    if taker_fee is not None:
+        cfg.backtest = cfg.backtest.model_copy(update={"taker_fee": taker_fee})
     holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start"))
     out = Path("artifacts/experiments") / datetime.now(UTC).strftime("barrier-%Y%m%dT%H%M%SZ")
     report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs, pooled=pooled)
