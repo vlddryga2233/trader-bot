@@ -64,3 +64,46 @@ def make_barrier_labels(
         out[f"y_{name}"] = y
     out["label_end"] = feats.index + horizon * step
     return out
+
+
+def limit_entry_outcomes(feats: pd.DataFrame, horizon: int, stop_mult: float, tp_mult: float,
+                         offset_atr: float) -> pd.DataFrame:
+    """Compute R for one-candle limit entries; unfilled rows have zero return."""
+    close = feats["ctx_close"].to_numpy(dtype=float)
+    high = feats["ctx_high"].to_numpy(dtype=float)
+    low = feats["ctx_low"].to_numpy(dtype=float)
+    atr = feats["ctx_atr"].to_numpy(dtype=float)
+    n = len(feats)
+    stop_d, tp_d = stop_mult * atr, tp_mult * atr
+    rr = tp_mult / stop_mult
+    out = pd.DataFrame(index=feats.index)
+    for side, name in ((1, "long"), (-1, "short")):
+        entry = close - side * offset_atr * atr
+        r = np.full(n, np.nan)
+        filled = np.zeros(n, dtype=bool)
+        for i in range(max(n - horizon, 0)):
+            if not (np.isfinite(stop_d[i]) and stop_d[i] > 0):
+                continue
+            touched = low[i + 1] < entry[i] if side == 1 else high[i + 1] > entry[i]
+            if not touched:
+                r[i] = 0.0
+                continue
+            filled[i] = True
+            stop = entry[i] - side * stop_d[i]
+            tp = entry[i] + side * tp_d[i]
+            result = None
+            for j in range(1, horizon + 1):
+                stop_hit = low[i + j] <= stop if side == 1 else high[i + j] >= stop
+                if stop_hit:
+                    result = -1.0
+                    break
+                tp_hit = high[i + j] >= tp if side == 1 else low[i + j] <= tp
+                if j > 1 and tp_hit:
+                    result = rr
+                    break
+            if result is None:
+                result = side * (close[i + horizon] - entry[i]) / stop_d[i]
+            r[i] = result
+        out[f"r_{name}_limit"] = r
+        out[f"filled_{name}"] = filled
+    return out

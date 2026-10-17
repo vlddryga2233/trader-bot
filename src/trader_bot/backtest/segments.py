@@ -9,10 +9,11 @@ from trader_bot.config.settings import StrategyConfig
 
 
 def simulate_segment(prepared: dict[str, dict], cfg: StrategyConfig, seg_start: pd.Timestamp,
-                     seg_end: pd.Timestamp, signal_fn: SignalFn) -> dict:
+                     seg_end: pd.Timestamp, signal_fn: SignalFn,
+                     bar: pd.Timedelta = BAR) -> dict:
     """Simulate prepared symbol inputs, dropping entries that cannot finish before seg_end."""
     share = cfg.backtest.initial_equity / len(cfg.symbols)
-    tradable_end = seg_end - cfg.labeling.horizon_candles * BAR
+    tradable_end = seg_end - cfg.labeling.horizon_candles * bar
     curves, trades_all, per_symbol = [], [], {}
     for symbol, item in prepared.items():
         preds = item["preds"]
@@ -25,6 +26,7 @@ def simulate_segment(prepared: dict[str, dict], cfg: StrategyConfig, seg_start: 
             bars, preds, item["atr"].reindex(preds.index), item["funding"], cfg.risk,
             cfg.backtest, 0.0, cfg.labeling.horizon_candles, share, diagnostics,
             signal_fn=signal_fn,
+            bar=bar,
         )
         curves.append(equity.rename(symbol))
         if not trades.empty:

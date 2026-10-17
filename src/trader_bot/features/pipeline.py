@@ -30,6 +30,10 @@ def reference_symbol(symbol: str) -> str:
 
 def features_for_symbol(engine: Engine, symbol: str, cfg: StrategyConfig) -> tuple[pd.DataFrame, dict]:
     raw = load_raw(engine, symbol)
+    if cfg.decision_interval == "1d":
+        from trader_bot.features.daily import daily_features
+
+        return daily_features(raw["kd"], raw["funding"]), raw
     ref_k4 = None
     if cfg.features.groups.cross_asset:
         ref_k4 = store.load_frame(engine, schema.klines, "open_time", reference_symbol(symbol),

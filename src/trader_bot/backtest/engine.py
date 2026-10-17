@@ -43,6 +43,7 @@ def simulate(
     initial_equity: float,
     diagnostics: dict | None = None,
     signal_fn: SignalFn | None = None,
+    bar: pd.Timedelta = BAR,
 ) -> tuple[pd.Series, pd.DataFrame]:
     fee, slip = bt.taker_fee, bt.slippage_bps / 10_000
     cash = initial_equity
@@ -82,7 +83,7 @@ def simulate(
         })
         pos = None
 
-    for t, bar in bars.iterrows():
+    for t, candle in bars.iterrows():
         # entry at the open of this bar from the decision made at the previous close
         if t in preds.index and pos is not None:
             diag["position_open_skips"] += 1
@@ -121,10 +122,10 @@ def simulate(
                     confidence_threshold,
                 )
             else:
-                sig = signal_fn(row, float(bar["open"]), float(atr.loc[t]))
+                sig = signal_fn(row, float(candle["open"]), float(atr.loc[t]))
             if sig is not None:
                 diag["signal_pass"] += 1
-                entry = bar["open"] * (1 + sig.direction * slip)
+                entry = candle["open"] * (1 + sig.direction * slip)
                 plan = plan_trade(sig, cash, entry, float(atr.loc[t]), risk)
                 if isinstance(plan, Rejection):
                     reasons = diag["risk_plan_rejections"]
@@ -136,22 +137,28 @@ def simulate(
 
         if pos is not None:
             pos.bars += 1
-            f = funding.loc[(funding.index > t) & (funding.index <= t + BAR)]
+            f = funding.loc[(funding.index > t) & (funding.index <= t + bar)]
             for rate in f:
-                pos.funding -= pos.direction * rate * pos.qty * bar["close"]
+                pos.funding -= pos.direction * rate * pos.qty * candle["close"]
 
-            hit_stop = (bar["low"] <= pos.stop) if pos.direction == 1 else (bar["high"] >= pos.stop)
-            hit_tp = (bar["high"] >= pos.tp) if pos.direction == 1 else (bar["low"] <= pos.tp)
-            close_t = t + BAR
+            hit_stop = (candle["low"] <= pos.stop) if pos.direction == 1 else (
+                candle["high"] >= pos.stop
+            )
+            hit_tp = (candle["high"] >= pos.tp) if pos.direction == 1 else (
+                candle["low"] <= pos.tp
+            )
+            close_t = t + bar
             if hit_stop:
-                gap = min(bar["open"], pos.stop) if pos.direction == 1 else max(bar["open"], pos.stop)
+                gap = min(candle["open"], pos.stop) if pos.direction == 1 else max(
+                    candle["open"], pos.stop
+                )
                 close_pos(gap * (1 - pos.direction * slip), close_t, "stop")
             elif hit_tp:
                 close_pos(pos.tp * (1 - pos.direction * slip), close_t, "take_profit")
             elif pos.bars >= horizon:
-                close_pos(bar["close"] * (1 - pos.direction * slip), close_t, "time")
+                close_pos(candle["close"] * (1 - pos.direction * slip), close_t, "time")
 
-        unreal = pos.direction * (bar["close"] - pos.entry) * pos.qty if pos else 0.0
-        equity_points[t + BAR] = cash + unreal
+        unreal = pos.direction * (candle["close"] - pos.entry) * pos.qty if pos else 0.0
+        equity_points[t + bar] = cash + unreal
 
     return pd.Series(equity_points, dtype=float), pd.DataFrame(trades)

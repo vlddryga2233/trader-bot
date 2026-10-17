@@ -5,7 +5,13 @@ import pytest
 from trader_bot.backtest.engine import simulate
 from trader_bot.backtest.metrics import compute_metrics, passes_gate
 from trader_bot.config.settings import BacktestCfg, RiskCfg
-from trader_bot.execution.filters import SymbolFilters, parse_filters, round_price, round_qty, valid_order
+from trader_bot.execution.filters import (
+    SymbolFilters,
+    parse_filters,
+    round_price,
+    round_qty,
+    valid_order,
+)
 
 RISK = RiskCfg(risk_per_trade=0.01, leverage=3, atr_stop_mult=2.0, min_reward_risk=1.0,
                daily_loss_limit=0.5, weekly_loss_limit=0.5)
@@ -93,6 +99,22 @@ def test_funding_paid_by_longs_when_rate_positive():
     funding = pd.Series([0.001], index=pd.DatetimeIndex([bars.index[1] + pd.Timedelta(hours=1)]))
     _, trades = simulate(bars, preds, atr, funding, RISK, BT, 0.75, horizon=2, initial_equity=10_000)
     assert trades.iloc[0]["pnl"] == pytest.approx(-0.001 * 50 * 100)
+
+
+def test_simulate_supports_daily_bar_duration():
+    from trader_bot.risk.engine import Signal
+
+    idx = pd.date_range("2024-01-01", periods=2, freq="1D", tz="UTC")
+    bars = pd.DataFrame([[100, 101, 99.5, 100], [100, 100.5, 99.5, 100]],
+                        columns=["open", "high", "low", "close"], index=idx)
+    preds = pd.DataFrame({"x": [1.0]}, index=idx[:1])
+    atr = pd.Series([1.0], index=idx[:1])
+    funding = pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
+    _, trades = simulate(bars, preds, atr, funding, RISK, BT, 0.0, horizon=1,
+                         initial_equity=10_000,
+                         signal_fn=lambda row, price, a: Signal(1, 1.0, 0.05),
+                         bar=pd.Timedelta(days=1))
+    assert trades.iloc[0]["closed_at"] == idx[0] + pd.Timedelta(days=1)
 
 
 def test_no_trade_below_confidence():

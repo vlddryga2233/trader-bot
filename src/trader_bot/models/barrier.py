@@ -12,7 +12,7 @@ from sklearn.metrics import brier_score_loss, roc_auc_score
 
 from trader_bot.config.settings import StrategyConfig
 from trader_bot.features.builder import model_columns
-from trader_bot.labeling.barriers import make_barrier_labels
+from trader_bot.labeling.barriers import limit_entry_outcomes, make_barrier_labels
 from trader_bot.models.cv import purged_walk_forward
 from trader_bot.models.ensemble import DEFAULT_PARAMS
 from trader_bot.models.train import CORE_FEATURES
@@ -35,6 +35,7 @@ class BarrierDataset:
     r_short: pd.Series
     has_label: pd.Series
     columns: list[str]
+    limit: pd.DataFrame | None = None
 
     @property
     def labeled(self) -> np.ndarray:
@@ -44,10 +45,15 @@ class BarrierDataset:
 def build_barrier_dataset(feats: pd.DataFrame, cfg: StrategyConfig) -> BarrierDataset:
     valid = feats.dropna(subset=[*CORE_FEATURES, "ctx_atr", "ctx_high", "ctx_low"])
     lab = make_barrier_labels(valid, cfg.labeling.horizon_candles, cfg.risk.atr_stop_mult,
-                              cfg.barrier.tp_atr_mult)
+                              cfg.barrier.tp_atr_mult, step=pd.Timedelta(cfg.decision_interval))
     has = lab["r_long"].notna() & lab["r_short"].notna()
+    limit = None
+    if cfg.barrier.limit_offset_atr > 0:
+        limit = limit_entry_outcomes(valid, cfg.labeling.horizon_candles,
+                                     cfg.risk.atr_stop_mult, cfg.barrier.tp_atr_mult,
+                                     cfg.barrier.limit_offset_atr)
     return BarrierDataset(valid, lab["y_long"], lab["y_short"], lab["r_long"], lab["r_short"],
-                          has, model_columns(valid))
+                          has, model_columns(valid), limit)
 
 
 def _binary_models(seed: int, size: str = "default") -> list:
@@ -76,7 +82,8 @@ class BarrierModel:
     def _raw(self, side: str, Xc: pd.DataFrame) -> np.ndarray:
         return np.mean([m.predict_proba(Xc)[:, 1] for m in self.models[side]], axis=0)
 
-    def fit(self, X: pd.DataFrame, y_long: pd.Series, y_short: pd.Series) -> BarrierModel:
+    def fit(self, X: pd.DataFrame, y_long: pd.Series,
+            y_short: pd.Series | None) -> BarrierModel:
         """X rows must be time-ordered and fully labeled."""
         Xc = X[self.columns]
         n = len(Xc)
@@ -86,6 +93,8 @@ class BarrierModel:
         if not use_calibration:
             fit_end = n
         for side, y in (("long", y_long), ("short", y_short)):
+            if y is None:
+                continue
             y_int = y.astype(int)
             if y_int.iloc[:fit_end].nunique() < 2:
                 raise ValueError(f"{side} labels contain a single class")
@@ -103,12 +112,12 @@ class BarrierModel:
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         Xc = X[self.columns]
         out = pd.DataFrame(index=X.index)
-        for side in ("long", "short"):
+        for side in self.models:
             raw = self._raw(side, Xc)
             iso = self.calibrators[side]
             out[f"p_{side}_raw"] = raw
             out[f"p_{side}_win"] = iso.predict(raw) if iso is not None else raw
-        return out[BARRIER_PRED_COLS]
+        return out[[col for col in BARRIER_PRED_COLS if col in out]]
 
 
 def _auc(y: np.ndarray, p: np.ndarray) -> float | None:
@@ -143,7 +152,8 @@ def _t_stat(values: np.ndarray) -> float | None:
 
 def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
                            y_short: pd.Series, r_long: pd.Series, r_short: pd.Series,
-                           cfg: StrategyConfig) -> dict:
+                           cfg: StrategyConfig, primary: np.ndarray | None = None,
+                           limit: pd.DataFrame | None = None) -> dict:
     """Score probabilities and the EV trading rule on out-of-sample rows (all aligned)."""
     stop_mult, tp_mult = cfg.risk.atr_stop_mult, cfg.barrier.tp_atr_mult
     rr = tp_mult / stop_mult
@@ -164,7 +174,7 @@ def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
     n_signals = int(signal.sum())
     trades = non_overlapping(signal, cfg.labeling.horizon_candles)
     trade_r = realized[trades]
-    return {
+    out = {
         "n_oos": len(P),
         "reward_risk": rr,
         "rr_meets_risk_floor": rr >= cfg.risk.min_reward_risk,
@@ -188,6 +198,33 @@ def barrier_signal_metrics(P: pd.DataFrame, X: pd.DataFrame, y_long: pd.Series,
         "always_long_mean_net_r": float(np.mean(rl - cost_r)),
         "always_short_mean_net_r": float(np.mean(rs - cost_r)),
     }
+    if primary is not None:
+        fire = primary != 0
+        primary_r = np.where(primary == 1, rl, rs) - cost_r
+        primary_trades = non_overlapping(fire, cfg.labeling.horizon_candles)
+        out["primary_n_trades_nonoverlap"] = int(primary_trades.sum())
+        out["primary_mean_net_r_nonoverlap"] = (
+            float(primary_r[primary_trades].mean()) if primary_trades.any() else None
+        )
+    if limit is not None:
+        is_long = direction == 1
+        filled = np.where(is_long, limit["filled_long"].to_numpy(),
+                          limit["filled_short"].to_numpy()).astype(bool)
+        bt = cfg.backtest
+        limit_cost_r = (bt.maker_fee + bt.taker_fee + bt.slippage_bps / 10_000) * price / (
+            stop_mult * atr
+        )
+        limit_r = np.where(is_long, limit["r_long_limit"].to_numpy(),
+                           limit["r_short_limit"].to_numpy()) - np.where(
+                               filled, limit_cost_r, 0.0
+                           )
+        limit_trade_r = limit_r[trades]
+        out["limit_fill_rate"] = float(filled[trades].mean()) if trades.any() else None
+        out["limit_mean_net_r_nonoverlap"] = (
+            float(limit_trade_r.mean()) if len(limit_trade_r) else None
+        )
+        out["limit_t_stat_nonoverlap"] = _t_stat(limit_trade_r)
+    return out
 
 
 def cv_evaluate_barrier(ds: BarrierDataset, cfg: StrategyConfig) -> dict:
@@ -196,6 +233,7 @@ def cv_evaluate_barrier(ds: BarrierDataset, cfg: StrategyConfig) -> dict:
     X = ds.X.iloc[lab]
     yl, ys = ds.y_long.iloc[lab], ds.y_short.iloc[lab]
     rl, rs = ds.r_long.iloc[lab], ds.r_short.iloc[lab]
+    lim = ds.limit.iloc[lab] if ds.limit is not None else None
     m, h = cfg.model, cfg.labeling.horizon_candles
     preds, folds = [], []
     for fold, (tr, te) in enumerate(
@@ -210,20 +248,23 @@ def cv_evaluate_barrier(ds: BarrierDataset, cfg: StrategyConfig) -> dict:
         prediction = model.predict(X.iloc[te])
         preds.append(prediction)
         fold_metrics = barrier_signal_metrics(prediction, X.iloc[te], yl.iloc[te], ys.iloc[te],
-                                              rl.iloc[te], rs.iloc[te], cfg)
+                                              rl.iloc[te], rs.iloc[te], cfg,
+                                              limit=lim.iloc[te] if lim is not None else None)
         folds.append({
             "fold": fold, "n_train": len(tr), "n_test": len(te),
-            **{key: fold_metrics[key] for key in FOLD_KEYS},
+            **{key: fold_metrics[key] for key in FOLD_KEYS if key in fold_metrics},
         })
     P = pd.concat(preds)
     idx = P.index
     metrics = barrier_signal_metrics(P, X.loc[idx], yl.loc[idx], ys.loc[idx], rl.loc[idx],
-                                     rs.loc[idx], cfg)
+                                     rs.loc[idx], cfg,
+                                     limit=lim.loc[idx] if lim is not None else None)
     return summarize_folds(metrics, folds)
 
 
 FOLD_KEYS = ("auc_long", "auc_short", "n_signals", "hit_rate_on_signals",
-             "mean_net_r_on_signals", "n_trades_nonoverlap", "mean_net_r_nonoverlap")
+             "mean_net_r_on_signals", "n_trades_nonoverlap", "mean_net_r_nonoverlap",
+             "limit_mean_net_r_nonoverlap")
 
 
 def summarize_folds(metrics: dict, folds: list[dict]) -> dict:
@@ -234,6 +275,8 @@ def summarize_folds(metrics: dict, folds: list[dict]) -> dict:
     metrics["folds_with_positive_mean_r"] = positive("mean_net_r_on_signals")
     metrics["folds_with_positive_nonoverlap_r"] = positive("mean_net_r_nonoverlap")
     metrics["folds_with_signals"] = sum(1 for fold in folds if fold["n_signals"] > 0)
+    if folds and "limit_mean_net_r_nonoverlap" in folds[0]:
+        metrics["folds_with_positive_limit_r"] = positive("limit_mean_net_r_nonoverlap")
     return metrics
 
 

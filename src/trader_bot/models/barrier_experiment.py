@@ -11,6 +11,7 @@ from trader_bot.config.settings import StrategyConfig
 from trader_bot.features.pipeline import features_for_symbol
 from trader_bot.models.barrier import build_barrier_dataset, cv_evaluate_barrier
 from trader_bot.models.pooled import cv_evaluate_pooled
+from trader_bot.models.selection import select
 
 log = structlog.get_logger()
 SUMMARY_KEYS = ("reward_risk", "rr_meets_risk_floor", "auc_long", "auc_short", "n_signals",
@@ -22,7 +23,8 @@ SUMMARY_KEYS = ("reward_risk", "rr_meets_risk_floor", "auc_long", "auc_short", "
 
 def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,
                            holdout_start: pd.Timestamp, tp_atr_mults: list[float],
-                           horizons: list[int], pooled: bool = False) -> dict:
+                           horizons: list[int], pooled: bool = False,
+                           t_min: float = 3.0, min_trades: int = 40) -> dict:
     """Grid barrier variants using only pre-holdout rows for model selection."""
     report: dict = {
         "holdout_start": str(holdout_start),
@@ -33,6 +35,10 @@ def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,
             "model_size": cfg.barrier.model_size,
             "taker_fee": cfg.backtest.taker_fee,
             "slippage_bps": cfg.backtest.slippage_bps,
+            "maker_fee": cfg.backtest.maker_fee,
+            "limit_offset_atr": cfg.barrier.limit_offset_atr,
+            "decision_interval": cfg.decision_interval,
+            "min_train_candles": cfg.model.min_train_candles,
         },
     }
     if pooled:
@@ -72,6 +78,8 @@ def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,
                     log.info("barrier_experiment.variant", symbol=symbol, horizon=horizon, tp=tp,
                              **{key: metrics[key] for key in SUMMARY_KEYS})
             report["symbols"][symbol] = results
+    mode = "limit" if cfg.barrier.limit_offset_atr > 0 else "barrier"
+    report["selection"] = select(report, mode, t_min, min_trades)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "report.json").write_text(json.dumps(report, indent=2, default=str))
     return report

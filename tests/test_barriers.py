@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from trader_bot.labeling.barriers import make_barrier_labels
+from trader_bot.labeling.barriers import limit_entry_outcomes, make_barrier_labels
 
 
 def _feats(high, low, close=None, atr=1.0):
@@ -48,3 +48,27 @@ def test_labels_do_not_depend_on_rows_beyond_horizon():
 def test_invalid_atr_gives_nan():
     lab = make_barrier_labels(_feats([100] * 6, [100] * 6, atr=np.nan), 3, 2.0, 3.0)
     assert lab["r_long"].isna().all()
+
+
+def _path(highs, lows):
+    idx = pd.date_range("2024-01-01", periods=len(highs), freq="4h", tz="UTC")
+    return pd.DataFrame({"ctx_close": 100.0, "ctx_atr": 1.0, "ctx_high": highs,
+                         "ctx_low": lows}, index=idx)
+
+
+def test_limit_entry_not_filled_without_trading_through():
+    out = limit_entry_outcomes(_path([100, 100.5, 100.5], [100, 99.6, 99.6]), 2, 2.0, 4.0, 0.5)
+    assert out["r_long_limit"].iloc[0] == 0.0 and not out["filled_long"].iloc[0]
+    assert out["r_short_limit"].iloc[0] == 0.0 and not out["filled_short"].iloc[0]
+    assert np.isnan(out["r_long_limit"].iloc[1])
+
+
+def test_limit_entry_fill_then_target():
+    out = limit_entry_outcomes(_path([100, 100, 104], [100, 99.4, 99.4]), 2, 2.0, 4.0, 0.5)
+    assert out["filled_long"].iloc[0]
+    assert out["r_long_limit"].iloc[0] == 2.0
+
+
+def test_limit_entry_stop_on_fill_candle():
+    out = limit_entry_outcomes(_path([100, 100, 100], [100, 97.0, 99.0]), 2, 2.0, 4.0, 0.5)
+    assert out["r_long_limit"].iloc[0] == -1.0

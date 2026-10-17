@@ -87,10 +87,12 @@ class BarrierCfg(BaseModel):
     promotion_min_signals: int = Field(default=30, ge=1)
     promotion_min_mean_r: float = 0.05
     model_size: Literal["default", "small"] = "default"
+    limit_offset_atr: float = Field(default=0.0, ge=0, le=1)
 
 
 class BacktestCfg(BaseModel):
     taker_fee: float = 0.0005
+    maker_fee: float = 0.0002
     slippage_bps: float = 2.0
     initial_equity: float = 10000
     start: str = "2023-10-01"
@@ -98,7 +100,7 @@ class BacktestCfg(BaseModel):
 
 class StrategyConfig(BaseModel):
     symbols: list[str] = Field(default_factory=lambda: ["BTCUSDT", "ETHUSDT"])
-    decision_interval: str = "4h"
+    decision_interval: Literal["4h", "1d"] = "4h"
     history_start: str = "2022-06-01"
     features: FeaturesCfg = FeaturesCfg()
     labeling: LabelingCfg = LabelingCfg()
@@ -117,4 +119,6 @@ def load_strategy(path: Path | str) -> StrategyConfig:
         cfg.barrier.tp_atr_mult / cfg.risk.atr_stop_mult < cfg.risk.min_reward_risk
     ):
         raise ValueError("barrier.tp_atr_mult / risk.atr_stop_mult is below risk.min_reward_risk")
+    if cfg.decision_interval != "4h":
+        raise ValueError("decision_interval 1d is research-only; use --interval 1d")
     return cfg

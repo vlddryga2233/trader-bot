@@ -82,7 +82,7 @@ def cv_evaluate_pooled(datasets: dict[str, BarrierDataset], cfg: StrategyConfig)
         for symbol in datasets:
             fm = score(P, te, symbol)
             folds[symbol].append({"fold": fold, "n_test": fm["n_oos"],
-                                  **{key: fm[key] for key in FOLD_KEYS}})
+                                  **{key: fm[key] for key in FOLD_KEYS if key in fm}})
     P, rows = pd.concat(preds), np.concatenate(all_rows)
     return {symbol: summarize_folds(score(P, rows, symbol), folds[symbol])
             for symbol in datasets}

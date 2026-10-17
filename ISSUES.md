@@ -96,7 +96,7 @@ R2-A through R2-D all failed the joint selection rule. No cell met all six crite
 | 18 | 3.0 | -0.008 | -0.10 | 1/5 | 151 | +0.025 | 0.28 | 2/5 | 139 | 7/12 |
 | 18 | 4.0 | +0.258 | 2.72 | 4/5 | 183 | -0.002 | -0.02 | 3/5 | 189 | 9/12 |
 
-### R2-B — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': False, 'calendar': False, 'derivs_extra': False}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+### R2-B (pooled) — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': False, 'calendar': False, 'derivs_extra': False}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
 
 | Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -107,7 +107,7 @@ R2-A through R2-D all failed the joint selection rule. No cell met all six crite
 | 18 | 3.0 | +0.011 | 0.09 | 3/5 | 91 | -0.017 | -0.14 | 2/5 | 78 | 7/12 |
 | 18 | 4.0 | -0.145 | -1.16 | 2/5 | 94 | +0.092 | 0.76 | 2/5 | 113 | 7/12 |
 
-### R2-C — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+### R2-C (pooled) — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
 
 | Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -118,7 +118,7 @@ R2-A through R2-D all failed the joint selection rule. No cell met all six crite
 | 18 | 3.0 | -0.098 | -0.85 | 2/5 | 95 | +0.087 | 0.57 | 3/5 | 58 | 6/12 |
 | 18 | 4.0 | +0.169 | 1.14 | 3/5 | 77 | -0.094 | -0.59 | 1/5 | 64 | 7/12 |
 
-### R2-D — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'small', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+### R2-D (pooled) — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'small', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
 
 | Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -142,3 +142,50 @@ R2-A through R2-D all failed the joint selection rule. No cell met all six crite
 
 
 Conclusion: no robust 4h directional edge after costs with available data. Phase 18 stops here; do not run `barrier-backtest --holdout-start`. Phase 19 is gated on a qualifying holdout result and explicit approval, so live wiring was not started.
+
+## Round 3 (2026-10-17)
+
+The fixed pre-holdout protocol ran once, in order. Selection uses the report's joint BTC/ETH gates;
+all runs used the default `t_min=3.0` and `min_trades=40`. No holdout was run.
+
+Reports:
+
+- R3-M: `artifacts/experiments/meta-20261017T110228Z/report.json`
+- R3-D: `artifacts/experiments/barrier-20261017T110334Z/report.json`
+- R3-L1: `artifacts/experiments/barrier-20261017T110450Z/report.json`
+- R3-L2: `artifacts/experiments/barrier-20261017T110626Z/report.json`
+
+### R3-M — rule regime filter
+
+| Primary | Horizon | TP ATR | Gates | Passed | BTC mean R / t / trades | ETH mean R / t / trades |
+|---|---:|---:|---:|:---:|---:|---:|
+| breakout_20 | 6 | 3.0 | 5/12 | no | -0.039 / -0.25 / 33 | +0.040 / 0.23 / 33 |
+| breakout_20 | 12 | 3.0 | 9/12 | no | +0.212 / 1.53 / 62 | +0.032 / 0.34 / 119 |
+| momentum_42 | 6 | 3.0 | 4/12 | no | +0.176 / 0.97 / 33 | -0.010 / -0.09 / 55 |
+| momentum_42 | 12 | 3.0 | 4/12 | no | +0.071 / 0.42 / 37 | -0.111 / -0.91 / 67 |
+
+### R3-D — pooled daily model
+
+| Horizon | TP ATR | Gates | Passed | BTC mean R / t / trades | ETH mean R / t / trades |
+|---:|---:|---:|:---:|---:|---:|
+| 5 | 3.0 | 5/12 | no | +0.080 / 0.49 / 28 | +0.419 / 1.15 / 6 |
+| 5 | 4.0 | 3/12 | no | +0.094 / 0.46 / 25 | -0.071 / -0.35 / 20 |
+| 10 | 3.0 | 4/12 | no | +0.216 / 1.22 / 31 | +0.253 / 0.99 / 17 |
+| 10 | 4.0 | 3/12 | no | +0.180 / 0.58 / 10 | -0.046 / -0.10 / 6 |
+
+### R3-L1 — limit offset 0.25 ATR
+
+| Horizon | TP ATR | Gates | Passed | BTC limit mean R / t / trades / fill | ETH limit mean R / t / trades / fill |
+|---:|---:|---:|:---:|---:|---:|
+| 12 | 4.0 | 4/12 | no | +0.218 / 2.48 / 111 / 64.0% | +0.020 / 0.28 / 121 / 56.2% |
+| 18 | 4.0 | 8/12 | no | +0.246 / 3.35 / 183 / 59.0% | +0.004 / 0.06 / 189 / 57.1% |
+
+### R3-L2 — limit offset 0.5 ATR
+
+| Horizon | TP ATR | Gates | Passed | BTC limit mean R / t / trades / fill | ETH limit mean R / t / trades / fill |
+|---:|---:|---:|:---:|---:|---:|
+| 12 | 4.0 | 4/12 | no | +0.000 / 0.01 / 111 / 29.7% | +0.005 / 0.10 / 121 / 30.6% |
+| 18 | 4.0 | 7/12 | no | +0.111 / 2.02 / 183 / 33.3% | -0.007 / -0.13 / 189 / 32.3% |
+
+Conclusion: no edge found in Rounds 1–3 with available data; strategy unproven. No holdout was used,
+Phase 25 was not triggered, and the repository remains research tooling.

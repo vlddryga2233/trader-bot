@@ -7,6 +7,7 @@ from trader_bot.models.barrier import (
     BarrierDataset,
     BarrierModel,
     _t_stat,
+    barrier_signal_metrics,
     cv_evaluate_barrier,
     non_overlapping,
 )
@@ -91,3 +92,37 @@ def test_small_model_option_fits():
     model = BarrierModel(ds.columns, purge=12, calib_frac=0.3, size="small").fit(
         ds.X, ds.y_long, ds.y_short)
     assert model.models["long"][0].get_params()["num_leaves"] == 15
+
+
+def _feats(n=900, seed=0):
+    rng = np.random.default_rng(seed)
+    idx = pd.date_range("2024-01-01", periods=n, freq="4h", tz="UTC", name="decision_time")
+    close = 100 * np.exp(np.cumsum(rng.normal(0, 0.01, n)))
+    f = pd.DataFrame({"ctx_close": close, "ctx_high": close * 1.005, "ctx_low": close * 0.995,
+                      "ctx_atr": close * 0.01}, index=idx)
+    f["ret_42"] = np.log(f["ctx_close"]).diff(42)
+    f["vol_42"] = np.log(f["ctx_close"]).diff().rolling(42).std()
+    f["atr_pct"] = 0.01
+    f["f1"] = rng.normal(size=n)
+    return f
+
+
+def test_signal_metrics_report_unfiltered_rule():
+    ds = _synthetic()
+    P = pd.DataFrame({"p_long_win": 0.9, "p_short_win": 0.0}, index=ds.X.index)
+    m = barrier_signal_metrics(P, ds.X, ds.y_long, ds.y_short, ds.r_long, ds.r_short,
+                               StrategyConfig(), primary=np.ones(len(P), dtype=int))
+    assert m["primary_n_trades_nonoverlap"] > 0
+    assert m["primary_mean_net_r_nonoverlap"] is not None
+
+
+def test_cv_evaluate_meta_runs_and_reports_comparator():
+    from trader_bot.models.meta import cv_evaluate_meta
+
+    cfg = StrategyConfig()
+    cfg.model = cfg.model.model_copy(update={"min_train_candles": 300, "cv_splits": 2})
+    cfg.labeling = cfg.labeling.model_copy(update={"horizon_candles": 12})
+    out = cv_evaluate_meta(_feats(), cfg, "momentum_42")
+    assert len(out["cv_folds"]) == 2
+    assert "primary_mean_net_r_nonoverlap" in out
+    assert out["n_rule_rows"] > 0

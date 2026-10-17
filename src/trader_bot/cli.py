@@ -3,8 +3,8 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from pathlib import Path
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 import structlog
 import typer
@@ -224,6 +224,11 @@ def barrier_experiment(
         "", help="Comma-separated extra feature groups to enable: cross_asset,calendar,derivs_extra"
     ),
     model_size: str = typer.Option("default", help="default or small"),
+    t_min: float = typer.Option(3.0, help="Minimum non-overlapping t-statistic"),
+    min_trades: int = typer.Option(40, help="Minimum non-overlapping trades per symbol"),
+    interval: str = typer.Option("4h", help="4h or 1d (1d is research-only)"),
+    min_train_candles: int | None = typer.Option(None, help="Override model.min_train_candles"),
+    limit_offset_atr: float = typer.Option(0.0, help="Limit entry offset in ATR (0 = market)"),
     taker_fee: float | None = typer.Option(
         None, help="What-if fee for cost sensitivity (report only; never used for selection)"
     ),
@@ -247,14 +252,25 @@ def barrier_experiment(
         raise typer.BadParameter(f"feature groups must be in {sorted(allowed)}")
     if model_size not in ("default", "small"):
         raise typer.BadParameter("model_size must be default or small")
+    if interval not in ("4h", "1d"):
+        raise typer.BadParameter("interval must be 4h or 1d")
+    if not 0 <= limit_offset_atr <= 1:
+        raise typer.BadParameter("limit_offset_atr must be between 0 and 1")
+    if pooled and limit_offset_atr > 0:
+        raise typer.BadParameter("limit entry is not supported with --pooled")
+    cfg.decision_interval = interval
+    if min_train_candles is not None:
+        cfg.model = cfg.model.model_copy(update={"min_train_candles": min_train_candles})
     groups = cfg.features.groups.model_copy(update={group: True for group in extra})
     cfg.features = cfg.features.model_copy(update={"groups": groups})
-    cfg.barrier = cfg.barrier.model_copy(update={"model_size": model_size})
+    cfg.barrier = cfg.barrier.model_copy(update={"model_size": model_size,
+                                                "limit_offset_atr": limit_offset_atr})
     if taker_fee is not None:
         cfg.backtest = cfg.backtest.model_copy(update={"taker_fee": taker_fee})
     holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start"))
     out = Path("artifacts/experiments") / datetime.now(UTC).strftime("barrier-%Y%m%dT%H%M%SZ")
-    report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs, pooled=pooled)
+    report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs, pooled=pooled,
+                                    t_min=t_min, min_trades=min_trades)
     summary = {
         symbol: [{"horizon_candles": item["horizon_candles"],
                   "tp_atr_mult": item["tp_atr_mult"],
@@ -262,8 +278,41 @@ def barrier_experiment(
                  for item in results]
         for symbol, results in report["symbols"].items()
     }
-    typer.echo(json.dumps({"report": str(out / "report.json"), "summary": summary},
+    typer.echo(json.dumps({"report": str(out / "report.json"), "summary": summary,
+                           "selection": report["selection"]},
                           indent=2, default=str))
+
+
+@app.command("meta-experiment")
+def meta_experiment(
+    holdout_start: str = typer.Option("2025-10-01", help="Rows from this date are excluded"),
+    primaries: str = typer.Option("breakout_20,momentum_42", help="Comma-separated rules"),
+    horizons: str = typer.Option("6,12", help="Comma-separated horizons in candles"),
+    tp_atr_mults: str = typer.Option("3.0", help="Comma-separated take-profit ATR mults"),
+    t_min: float = typer.Option(3.0, help="Minimum non-overlapping t-statistic"),
+    min_trades: int = typer.Option(40, help="Minimum non-overlapping trades per symbol"),
+) -> None:
+    """Purged-CV grid for a rule + model filter, using pre-holdout data only."""
+    import pandas as pd
+
+    from trader_bot.models.meta import PRIMARIES, run_meta_experiment
+
+    _, cfg, engine = _ctx()
+    rules = [value.strip() for value in primaries.split(",") if value.strip()]
+    if not rules or not set(rules) <= set(PRIMARIES):
+        raise typer.BadParameter(f"primaries must be in {list(PRIMARIES)}")
+    try:
+        tps = [float(value) for value in tp_atr_mults.split(",")]
+        hs = [int(value) for value in horizons.split(",")]
+    except ValueError as exc:
+        raise typer.BadParameter("use comma-separated numbers") from exc
+    if any(value <= 0 for value in tps) or any(value <= 0 for value in hs):
+        raise typer.BadParameter("values must be positive")
+    holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start"))
+    out = Path("artifacts/experiments") / datetime.now(UTC).strftime("meta-%Y%m%dT%H%M%SZ")
+    report = run_meta_experiment(engine, cfg, out, holdout, rules, hs, tps, t_min, min_trades)
+    typer.echo(json.dumps({"report": str(out / "report.json"),
+                           "selection": report["selection"]}, indent=2, default=str))
 
 
 @app.command("barrier-backtest")
