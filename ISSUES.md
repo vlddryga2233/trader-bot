@@ -78,3 +78,67 @@ Neither run passed the gate or showed a positive portfolio return after costs. K
 - Compare baseline against modeling and label variants using per-class metrics and trade counts across purged folds.
 - Evaluate any selected model/signal changes on a separate held-out period with realistic costs.
 - The resulting backtest has interpretable metrics and passes the configured gate before being treated as a viable strategy.
+
+## Barrier mode, Round 2 (2026-10-17)
+
+Ran the fixed Phase 18 sequence with the prescribed grid (`horizons=6,12,18`, `tp_atr_mults=3.0,4.0`). This is 24 selection cells per symbol across R2-A through R2-D. R2-W is the report-only lower-fee what-if. No holdout backtest was run. R2-W used the R2-A configuration because R2-A's best cell (h=18, TP=4.0) had the highest count of the 12 required per-symbol gates (9/12); no cell passed all gates. The fee what-if is excluded from selection.
+
+R2-A through R2-D all failed the joint selection rule. No cell met all six criteria for both symbols, including at least four positive non-overlapping folds and t-statistic ≥2.5. Some cells were positive on average, but results were inconsistent across folds/symbols and/or did not clear the significance and baseline criteria.
+
+### R2-A — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': False, 'calendar': False, 'derivs_extra': False}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+
+| Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 6 | 3.0 | -0.059 | -0.86 | 2/5 | 143 | -0.013 | -0.22 | 0/5 | 201 | 6/12 |
+| 6 | 4.0 | +0.154 | 1.31 | 2/5 | 63 | -0.023 | -0.19 | 2/5 | 58 | 4/12 |
+| 12 | 3.0 | -0.064 | -0.52 | 2/5 | 70 | +0.052 | 0.57 | 3/5 | 122 | 7/12 |
+| 12 | 4.0 | +0.224 | 2.07 | 3/5 | 111 | +0.039 | 0.39 | 2/5 | 121 | 6/12 |
+| 18 | 3.0 | -0.008 | -0.10 | 1/5 | 151 | +0.025 | 0.28 | 2/5 | 139 | 7/12 |
+| 18 | 4.0 | +0.258 | 2.72 | 4/5 | 183 | -0.002 | -0.02 | 3/5 | 189 | 9/12 |
+
+### R2-B — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': False, 'calendar': False, 'derivs_extra': False}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+
+| Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 6 | 3.0 | -0.127 | -1.28 | 1/5 | 79 | +0.033 | 0.18 | 2/5 | 32 | 5/12 |
+| 6 | 4.0 | -0.208 | -2.48 | 0/5 | 106 | -0.086 | -0.65 | 1/5 | 46 | 3/12 |
+| 12 | 3.0 | -0.108 | -1.03 | 1/5 | 96 | +0.018 | 0.15 | 2/5 | 70 | 7/12 |
+| 12 | 4.0 | -0.271 | -2.18 | 0/5 | 66 | -0.112 | -0.82 | 1/5 | 65 | 4/12 |
+| 18 | 3.0 | +0.011 | 0.09 | 3/5 | 91 | -0.017 | -0.14 | 2/5 | 78 | 7/12 |
+| 18 | 4.0 | -0.145 | -1.16 | 2/5 | 94 | +0.092 | 0.76 | 2/5 | 113 | 7/12 |
+
+### R2-C — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'default', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+
+| Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 6 | 3.0 | -0.109 | -1.08 | 1/5 | 80 | +0.080 | 0.47 | 2/5 | 34 | 4/12 |
+| 6 | 4.0 | -0.084 | -0.70 | 1/5 | 60 | +0.105 | 0.34 | 2/5 | 12 | 4/12 |
+| 12 | 3.0 | -0.210 | -1.87 | 1/5 | 85 | -0.299 | -2.32 | 0/5 | 67 | 6/12 |
+| 12 | 4.0 | -0.138 | -1.11 | 0/5 | 74 | -0.035 | -0.21 | 1/5 | 50 | 3/12 |
+| 18 | 3.0 | -0.098 | -0.85 | 2/5 | 95 | +0.087 | 0.57 | 3/5 | 58 | 6/12 |
+| 18 | 4.0 | +0.169 | 1.14 | 3/5 | 77 | -0.094 | -0.59 | 1/5 | 64 | 7/12 |
+
+### R2-D — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': True, 'calendar': True, 'derivs_extra': True}, 'model_size': 'small', 'taker_fee': 0.0005, 'slippage_bps': 2.0}
+
+| Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 6 | 3.0 | -0.070 | -0.85 | 1/5 | 122 | +0.096 | 0.82 | 2/5 | 70 | 7/12 |
+| 6 | 4.0 | -0.100 | -0.90 | 1/5 | 82 | -0.083 | -0.53 | 1/5 | 41 | 3/12 |
+| 12 | 3.0 | -0.170 | -1.63 | 1/5 | 101 | -0.168 | -1.69 | 1/5 | 106 | 6/12 |
+| 12 | 4.0 | -0.182 | -1.24 | 0/5 | 53 | -0.241 | -1.38 | 0/5 | 42 | 2/12 |
+| 18 | 3.0 | +0.033 | 0.28 | 2/5 | 94 | -0.189 | -1.61 | 1/5 | 83 | 7/12 |
+| 18 | 4.0 | +0.077 | 0.54 | 3/5 | 81 | -0.167 | -1.06 | 2/5 | 63 | 7/12 |
+
+### R2-W — {'feature_groups': {'price': True, 'derivatives': True, 'liquidations': False, 'onchain': False, 'cross_asset': False, 'calendar': False, 'derivs_extra': False}, 'model_size': 'default', 'taker_fee': 0.0002, 'slippage_bps': 2.0}
+
+| Horizon | TP ATR | BTC mean R | BTC t | BTC + folds/5 | BTC trades | ETH mean R | ETH t | ETH + folds/5 | ETH trades | Gates met/12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 6 | 3.0 | -0.047 | -0.70 | 1/5 | 153 | +0.007 | 0.13 | 2/5 | 201 | 7/12 |
+| 6 | 4.0 | +0.177 | 1.52 | 2/5 | 64 | +0.012 | 0.10 | 2/5 | 59 | 5/12 |
+| 12 | 3.0 | -0.044 | -0.37 | 1/5 | 75 | +0.094 | 1.05 | 4/5 | 124 | 8/12 |
+| 12 | 4.0 | +0.265 | 2.44 | 2/5 | 112 | +0.058 | 0.57 | 2/5 | 121 | 6/12 |
+| 18 | 3.0 | -0.019 | -0.23 | 1/5 | 161 | +0.056 | 0.63 | 3/5 | 142 | 7/12 |
+| 18 | 4.0 | +0.260 | 2.75 | 4/5 | 185 | +0.015 | 0.17 | 3/5 | 189 | 9/12 |
+
+
+Conclusion: no robust 4h directional edge after costs with available data. Phase 18 stops here; do not run `barrier-backtest --holdout-start`. Phase 19 is gated on a qualifying holdout result and explicit approval, so live wiring was not started.
