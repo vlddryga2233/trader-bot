@@ -13,7 +13,7 @@ log = structlog.get_logger()
 
 def retrain_symbol(engine: Engine, cfg: StrategyConfig, registry: ModelRegistry, symbol: str,
                    do_tune: bool = False, promote_model: bool = True) -> dict:
-    """Train on all labeled history; promote only if CV logloss is no worse than the current model."""
+    """Train on labeled history and promote only if CV directional quality clears its gates."""
     feats, _ = features_for_symbol(engine, symbol, cfg)
     ds = build_dataset(feats, cfg)
     params = tune(ds, cfg) if do_tune else None
@@ -26,7 +26,13 @@ def retrain_symbol(engine: Engine, cfg: StrategyConfig, registry: ModelRegistry,
         "horizon_candles": cfg.labeling.horizon_candles,
         "class_balance": cfg.model.class_balance,
     })
-    promoted = promote_model and registry.should_promote(symbol, metrics)
+    promoted = promote_model and registry.should_promote(
+        symbol,
+        metrics,
+        min_balanced_accuracy=cfg.model.promotion_min_balanced_accuracy,
+        min_signal_precision=cfg.model.promotion_min_signal_precision,
+        min_signal_coverage=cfg.model.promotion_min_signal_coverage,
+    )
     if promoted:
         registry.promote(symbol, version)
     log.info("retrain.done", symbol=symbol, version=version, promoted=promoted, **{

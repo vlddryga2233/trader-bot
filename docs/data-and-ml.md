@@ -48,10 +48,11 @@ The last `h` rows have no label and are never used for training.
 
 - **Ensemble:** LightGBM + CatBoost, probabilities averaged (classifier: short/flat/long) and returns averaged (regressor).
 - **Validation:** purged expanding-window walk-forward. Training stops `horizon + embargo` candles before each test block.
-- **Tuning:** `train --tune` runs Optuna per model family, minimising purged-CV multi-class logloss.
+- **Tuning:** `train --tune` runs Optuna per model family, maximising purged-CV balanced accuracy
+  so the majority `flat` class does not dominate parameter selection. Logloss remains reported.
 - **Label/imbalance experiment:** `uv run trader-bot experiment` compares flat ATR multipliers 0.5, 1.0, and 1.5 with classifiers unweighted and balanced. It writes fold-level metrics to `artifacts/experiments/<run>/report.json`; this is CV analysis, not a promotion or trading recommendation.
-- **Signal threshold study:** `uv run trader-bot signal-study --holdout-start 2025-10-01` reports actual/predicted class balance and probability distributions, searches confidence and minimum reward/risk grids on earlier validation predictions, then evaluates the selected pair on the final holdout. Validation labels whose horizon overlaps the holdout are purged. It does not modify strategy settings or promote models.
-- **Registry:** each training run saves a versioned artifact. A new version is promoted only if its CV logloss is no worse than the current one (the comparison is approximate, as the evaluation windows differ).
+- **Signal threshold study:** `uv run trader-bot signal-study --holdout-start 2025-10-01` reports actual/predicted class balance and probability distributions, searches confidence and minimum reward/risk grids on earlier validation predictions, then evaluates a selected pair on the final holdout. Selection requires at least 20 trades, positive validation Sharpe, profit factor above 1, and max drawdown below 15%; if none pass, the existing thresholds are reported as unvalidated. Validation labels whose horizon overlaps the holdout are purged. The study does not modify strategy settings or promote models.
+- **Registry:** each training run saves a versioned artifact. Promotion requires configurable CV floors for balanced accuracy, precision and coverage after both the confidence and return-agreement filters; a candidate must also improve the product of precision and coverage over the current model. This favors usable directional signals over majority-class logloss.
 - **Retraining:** the live loop retrains weekly; `train` does it on demand.
 - Not implemented: probability calibration.
 

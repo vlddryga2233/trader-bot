@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.metrics import log_loss
+from sklearn.metrics import balanced_accuracy_score, log_loss
 
 from trader_bot.config.settings import StrategyConfig
 from trader_bot.features.builder import model_columns
@@ -66,8 +66,8 @@ def cv_evaluate(ds: Dataset, cfg: StrategyConfig, params: dict | None = None) ->
         y_ret_true.append(yr.iloc[te].to_numpy())
         fold_metrics.append({
             "fold": fold,
-            "n_train": int(len(tr)),
-            "n_test": int(len(te)),
+            "n_train": len(tr),
+            "n_test": len(te),
             "train_class_counts": {
                 name: int((yc.iloc[tr].to_numpy() == cls).sum())
                 for cls, name in enumerate(("short", "flat", "long"))
@@ -87,6 +87,8 @@ def cv_evaluate(ds: Dataset, cfg: StrategyConfig, params: dict | None = None) ->
     hc = conf >= m.confidence_threshold
     directional = pred != 1
     directional_hc = directional & (conf >= m.confidence_threshold)
+    return_agreement = ((pred == 0) & (r < 0)) | ((pred == 2) & (r > 0))
+    directional_signal = directional_hc & return_agreement
     class_names = ("short", "flat", "long")
     class_metrics = {}
     true_counts, pred_counts = {}, {}
@@ -120,13 +122,18 @@ def cv_evaluate(ds: Dataset, cfg: StrategyConfig, params: dict | None = None) ->
             float((pred[directional_hc] == y[directional_hc]).mean())
             if directional_hc.any() else None
         ),
+        "directional_signal_coverage": float(directional_signal.mean()),
+        "directional_signal_precision": (
+            float((pred[directional_signal] == y[directional_signal]).mean())
+            if directional_signal.any() else None
+        ),
         "ret_corr": float(np.corrcoef(r, yr_t)[0, 1]),
-        "n_oos": int(len(y)),
+        "n_oos": len(y),
     }
 
 
 def tune(ds: Dataset, cfg: StrategyConfig, trials: int | None = None) -> dict:
-    """Optuna search per model family minimising purged-CV multi-logloss."""
+    """Tune classifier parameters for balanced directional classification."""
     lab = ds.labeled
     X, yc = ds.X.iloc[lab][ds.columns], ds.y_class.iloc[lab]
     m = cfg.model
@@ -134,15 +141,12 @@ def tune(ds: Dataset, cfg: StrategyConfig, trials: int | None = None) -> dict:
                                       m.embargo_candles, m.min_train_candles))
 
     def score(build) -> float:
-        losses = []
+        scores = []
         for tr, te in splits:
             model = build().fit(X.iloc[tr], yc.iloc[tr])
-            p = np.zeros((len(te), 3))
-            proba = model.predict_proba(X.iloc[te])
-            for j, c in enumerate(np.asarray(model.classes_).astype(int).ravel()):
-                p[:, c] = proba[:, j]
-            losses.append(log_loss(yc.iloc[te], p, labels=[0, 1, 2]))
-        return float(np.mean(losses))
+            predicted = model.predict(X.iloc[te]).astype(int).ravel()
+            scores.append(balanced_accuracy_score(yc.iloc[te], predicted))
+        return float(1.0 - np.mean(scores))
 
     def lgbm_obj(t: optuna.Trial) -> float:
         p = {"learning_rate": t.suggest_float("learning_rate", 0.01, 0.1, log=True),

@@ -17,6 +17,9 @@ labeling:
 model:
   confidence_threshold: 0.75
   class_balance: false    # `trader-bot experiment` compares balanced vs unweighted classifiers
+  promotion_min_balanced_accuracy: 0.38  # minimum purged-CV macro recall
+  promotion_min_signal_precision: 0.40  # after confidence and return-sign agreement filters
+  promotion_min_signal_coverage: 0.005  # share of OOS rows that produce an eligible signal
   embargo_candles: 6
   cv_splits: 5
   min_train_candles: 1500

@@ -43,8 +43,11 @@ class LabelingCfg(BaseModel):
 
 
 class ModelCfg(BaseModel):
-    confidence_threshold: float = 0.75
+    confidence_threshold: float = Field(default=0.75, ge=0.0, le=1.0)
     class_balance: bool = False
+    promotion_min_balanced_accuracy: float = Field(default=0.38, ge=0.0, le=1.0)
+    promotion_min_signal_precision: float = Field(default=0.40, ge=0.0, le=1.0)
+    promotion_min_signal_coverage: float = Field(default=0.005, ge=0.0, le=1.0)
     embargo_candles: int = 6
     cv_splits: int = 5
     min_train_candles: int = 1500

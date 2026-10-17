@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -38,12 +39,41 @@ class ModelRegistry:
     def promote(self, symbol: str, version: str) -> None:
         (self._dir(symbol) / "current.json").write_text(json.dumps({"version": version}))
 
-    def should_promote(self, symbol: str, new_metrics: dict, tolerance: float = 0.0) -> bool:
-        """Promote only if out-of-sample logloss is no worse than the current model's."""
+    def should_promote(
+        self,
+        symbol: str,
+        new_metrics: dict,
+        min_balanced_accuracy: float = 0.38,
+        min_signal_precision: float = 0.40,
+        min_signal_coverage: float = 0.005,
+    ) -> bool:
+        """Promote only candidates with useful directional quality and coverage."""
+        balanced_accuracy = new_metrics.get("balanced_accuracy")
+        precision = new_metrics.get("directional_signal_precision")
+        coverage = new_metrics.get("directional_signal_coverage")
+        if (
+            balanced_accuracy is None
+            or precision is None
+            or coverage is None
+            or not all(math.isfinite(value) for value in (balanced_accuracy, precision, coverage))
+            or balanced_accuracy < min_balanced_accuracy
+            or precision < min_signal_precision
+            or coverage < min_signal_coverage
+        ):
+            return False
         cur = self.current_version(symbol)
         if cur is None:
             return True
-        return new_metrics["logloss"] <= self.meta(symbol, cur)["metrics"]["logloss"] + tolerance
+        old = self.meta(symbol, cur)["metrics"]
+        old_precision = old.get("directional_signal_precision")
+        old_coverage = old.get("directional_signal_coverage")
+        old_quality = (
+            old_precision * old_coverage
+            if old_precision is not None and old_coverage is not None
+            and math.isfinite(old_precision) and math.isfinite(old_coverage) else None
+        )
+        new_quality = precision * coverage
+        return old_quality is None or new_quality > old_quality
 
     def load_current(self, symbol: str) -> tuple[Ensemble, str]:
         v = self.current_version(symbol)

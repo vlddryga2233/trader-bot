@@ -21,8 +21,9 @@ CLASS_NAMES = ("short", "flat", "long")
 CONFIDENCE_GRID = (0.30, 0.40, 0.50, 0.60, 0.70, 0.75)
 REWARD_RISK_GRID = (0.50, 0.75, 1.00, 1.25, 1.50)
 MIN_VALIDATION_TRADES = 20
-MIN_EXPLORATORY_TRADES = 5
 MAX_VALIDATION_DRAWDOWN = 0.15
+MIN_VALIDATION_SHARPE = 0.0
+MIN_VALIDATION_PROFIT_FACTOR = 1.0
 
 
 def _class_counts(values: pd.Series) -> dict[str, dict[str, float | int]]:
@@ -47,7 +48,7 @@ def _prediction_summary(preds: pd.DataFrame) -> dict:
     agree = np.where(predicted == 0, preds["pred_ret"] < 0, preds["pred_ret"] > 0)
     counts = pd.Series(predicted).value_counts().reindex(range(3), fill_value=0)
     return {
-        "rows": int(len(preds)),
+        "rows": len(preds),
         "predicted_classes": {
             name: {"count": int(counts.loc[i]), "fraction": float(counts.loc[i] / len(preds))}
             for i, name in enumerate(CLASS_NAMES)
@@ -74,6 +75,28 @@ def _json_safe(value):
     if isinstance(value, np.integer):
         return int(value)
     return value
+
+
+def _select_validation_candidate(validation_results: list[dict]) -> dict | None:
+    """Return the best candidate only when it clears minimum quality and sample gates."""
+    eligible = [
+        result for result in validation_results
+        if result["portfolio"].get("n_trades", 0) >= MIN_VALIDATION_TRADES
+        and abs(result["portfolio"].get("max_drawdown", 1.0)) <= MAX_VALIDATION_DRAWDOWN
+        and result["portfolio"].get("sharpe", float("-inf")) > MIN_VALIDATION_SHARPE
+        and result["portfolio"].get("profit_factor", 0.0) is not None
+        and result["portfolio"].get("profit_factor", 0.0) > MIN_VALIDATION_PROFIT_FACTOR
+    ]
+    if not eligible:
+        return None
+    return max(
+        eligible,
+        key=lambda result: (
+            result["portfolio"].get("sharpe", 0.0),
+            result["portfolio"].get("profit_factor", 0.0) or 0.0,
+            result["portfolio"].get("total_return", 0.0),
+        ),
+    )
 
 
 def _simulate_portfolio(
@@ -190,36 +213,26 @@ def run_signal_study(
                 "per_symbol": per_symbol,
             })
 
-    eligible = [
-        result for result in validation_results
-        if result["portfolio"].get("n_trades", 0) >= MIN_VALIDATION_TRADES
-        and abs(result["portfolio"].get("max_drawdown", 1.0)) <= MAX_VALIDATION_DRAWDOWN
-    ]
-    selection_status = "minimum_trade_count"
-    if not eligible:
-        eligible = [
-            result for result in validation_results
-            if result["portfolio"].get("n_trades", 0) >= MIN_EXPLORATORY_TRADES
-        ]
-        selection_status = "exploratory_low_sample"
-    if eligible:
-        selected = max(
-            eligible,
-            key=lambda result: (
-                result["portfolio"].get("sharpe", 0.0),
-                result["portfolio"].get("profit_factor", 0.0) or 0.0,
-                result["portfolio"].get("total_return", 0.0),
-            ),
+    selected = _select_validation_candidate(validation_results)
+    if selected is None:
+        # Do not promote a weak validation winner based only on its trade count.
+        default_metrics, default_by_symbol = _simulate_portfolio(
+            prepared,
+            cfg,
+            start,
+            validation_end,
+            cfg.model.confidence_threshold,
+            cfg.risk.min_reward_risk,
         )
-    else:
-        # No validation setting generated even five trades; carry the existing
-        # conservative thresholds to holdout and report that tuning was inconclusive.
-        selected = next(
-            result for result in validation_results
-            if result["confidence_threshold"] == cfg.model.confidence_threshold
-            and result["min_reward_risk"] == cfg.risk.min_reward_risk
-        )
+        selected = {
+            "confidence_threshold": cfg.model.confidence_threshold,
+            "min_reward_risk": cfg.risk.min_reward_risk,
+            "portfolio": default_metrics,
+            "per_symbol": default_by_symbol,
+        }
         selection_status = "no_viable_validation_setting; default_thresholds"
+    else:
+        selection_status = "minimum_trade_count_and_quality"
 
     confidence = selected["confidence_threshold"]
     reward_risk = selected["min_reward_risk"]
@@ -249,8 +262,10 @@ def run_signal_study(
             "confidence_grid": CONFIDENCE_GRID,
             "min_reward_risk_grid": REWARD_RISK_GRID,
             "selection_rule": (
-                f"maximize validation Sharpe with at least {MIN_VALIDATION_TRADES} trades "
-                f"and max drawdown <= {MAX_VALIDATION_DRAWDOWN:.0%}; otherwise exploratory"
+                f"maximize validation Sharpe only with at least {MIN_VALIDATION_TRADES} trades, "
+                f"positive Sharpe, profit factor > {MIN_VALIDATION_PROFIT_FACTOR:.2f}, and "
+                f"max drawdown <= {MAX_VALIDATION_DRAWDOWN:.0%}; otherwise report defaults "
+                "as unvalidated"
             ),
         },
         "class_and_probability_diagnostics": distributions,
