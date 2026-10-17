@@ -12,7 +12,7 @@ wheels/
 # Secrets / runtime state
 .env
 state/
-artifacts/models
+artifacts/
 data_cache/
 .pytest_cache/
 .ruff_cache/

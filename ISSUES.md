@@ -1,5 +1,24 @@
 # Known Issues
 
+## Barrier mode, Round 1 (2026-10-17)
+
+- **No barrier variant passed the Phase 11 rule.** The most folds with a positive mean R was 3 of 5,
+  on both symbols. Phase 11 therefore stops here: **do not run `barrier-backtest --holdout-start`.**
+- The best-looking cell (BTCUSDT, h=12, tp=4.0, +0.35 R on 542 signals) is concentrated in time:
+  per-fold signals were 292, 0, 224, 26 and 0. ETHUSDT h=12 tp=4.0: 15, 0, 0, 819 and 22.
+- AUC rises with `tp_atr_mult` (0.62–0.66) mainly because wide targets have low base rates (2–12%).
+  Higher AUC alone does not mean the model is more useful.
+- Costs are about 0.07 R per round trip at typical ATR, and `always_long_mean_net_r` is about zero
+  or negative in every cell. The model has to clear this cost before it shows any edge.
+- `n_signals` counts **overlapping** rows (a signal every bar during a 12-bar hold). The effective
+  trade count is much smaller, so these averages look more certain than they are.
+- Baselines: all four rules are negative or flat on the holdout. `breakout_20` was the only positive
+  one on validation (Sharpe 0.33, 90% CI [-0.73, 1.44]) and lost on the holdout (Sharpe -1.52).
+- The 4h history already starts around 2019-09 (≈13.2k rows per symbol), so backlog **H1 is done**.
+  More rows per symbol are not available; the remaining data lever is pooling symbols.
+
+Status: no candidate passed; holdout not used for barrier mode.
+
 ## Backtest completes with zero trades
 
 **Status:** Diagnostics implemented; model/signal investigation remains open  
