@@ -219,6 +219,7 @@ def barrier_experiment(
     holdout_start: str = typer.Option("2025-10-01", help="Rows from this date are excluded"),
     tp_atr_mults: str = typer.Option("2.0,3.0,4.0", help="Comma-separated take-profit ATR mults"),
     horizons: str = typer.Option("3,6,12", help="Comma-separated horizons in candles"),
+    pooled: bool = typer.Option(False, "--pooled", help="Train one model on all symbols"),
 ) -> None:
     """Purged-CV grid for barrier labels + EV rule, using only pre-holdout data."""
     import pandas as pd
@@ -235,7 +236,7 @@ def barrier_experiment(
         raise typer.BadParameter("values must be positive")
     holdout = pd.Timestamp(_parse_utc(holdout_start, "holdout_start"))
     out = Path("artifacts/experiments") / datetime.now(UTC).strftime("barrier-%Y%m%dT%H%M%SZ")
-    report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs)
+    report = run_barrier_experiment(engine, cfg, out, holdout, tps, hs, pooled=pooled)
     summary = {
         symbol: [{"horizon_candles": item["horizon_candles"],
                   "tp_atr_mult": item["tp_atr_mult"],

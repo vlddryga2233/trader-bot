@@ -62,3 +62,25 @@ def test_t_stat():
     assert _t_stat(np.array([1.0])) is None
     assert _t_stat(np.array([1.0, 1.0])) is None
     assert _t_stat(np.array([1.0, 2.0, 3.0])) > 3
+
+
+def test_pool_datasets_interleaves_symbols_in_time_order():
+    from trader_bot.models.pooled import SYMBOL_COL, pool_datasets
+
+    a, b = _synthetic(n=50, seed=1), _synthetic(n=50, seed=2)
+    pooled, symbols = pool_datasets({"BTCUSDT": a, "ETHUSDT": b})
+    assert len(pooled.X) == 100
+    assert pooled.X.index.is_monotonic_increasing
+    assert symbols.iloc[:2].tolist() == ["BTCUSDT", "ETHUSDT"]
+    assert SYMBOL_COL in pooled.columns
+
+
+def test_cv_evaluate_pooled_reports_each_symbol():
+    from trader_bot.models.pooled import cv_evaluate_pooled
+
+    cfg = StrategyConfig()
+    cfg.model = cfg.model.model_copy(update={"min_train_candles": 300, "cv_splits": 2})
+    out = cv_evaluate_pooled({"BTCUSDT": _synthetic(n=800, seed=1),
+                              "ETHUSDT": _synthetic(n=800, seed=2)}, cfg)
+    assert set(out) == {"BTCUSDT", "ETHUSDT"}
+    assert out["BTCUSDT"]["auc_long"] > 0.6

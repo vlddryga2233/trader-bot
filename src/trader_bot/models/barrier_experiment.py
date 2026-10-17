@@ -10,6 +10,7 @@ from sqlalchemy.engine import Engine
 from trader_bot.config.settings import StrategyConfig
 from trader_bot.features.pipeline import features_for_symbol
 from trader_bot.models.barrier import build_barrier_dataset, cv_evaluate_barrier
+from trader_bot.models.pooled import cv_evaluate_pooled
 
 log = structlog.get_logger()
 SUMMARY_KEYS = ("reward_risk", "rr_meets_risk_floor", "auc_long", "auc_short", "n_signals",
@@ -21,25 +22,46 @@ SUMMARY_KEYS = ("reward_risk", "rr_meets_risk_floor", "auc_long", "auc_short", "
 
 def run_barrier_experiment(engine: Engine, cfg: StrategyConfig, out_dir: Path,
                            holdout_start: pd.Timestamp, tp_atr_mults: list[float],
-                           horizons: list[int]) -> dict:
+                           horizons: list[int], pooled: bool = False) -> dict:
     """Grid barrier variants using only pre-holdout rows for model selection."""
-    report: dict = {"holdout_start": str(holdout_start), "symbols": {}}
-    for symbol in cfg.symbols:
-        feats, _ = features_for_symbol(engine, symbol, cfg)
-        feats = feats.loc[feats.index < holdout_start]
-        results = []
+    report: dict = {"holdout_start": str(holdout_start), "symbols": {}, "pooled": pooled}
+    if pooled:
+        features = {}
+        for symbol in cfg.symbols:
+            feats, _ = features_for_symbol(engine, symbol, cfg)
+            features[symbol] = feats.loc[feats.index < holdout_start]
         for horizon in horizons:
             for tp in tp_atr_mults:
                 variant = cfg.model_copy(update={
                     "labeling": cfg.labeling.model_copy(update={"horizon_candles": horizon}),
                     "barrier": cfg.barrier.model_copy(update={"tp_atr_mult": tp}),
                 })
-                metrics = cv_evaluate_barrier(build_barrier_dataset(feats, variant), variant)
-                results.append({"horizon_candles": horizon, "tp_atr_mult": tp,
-                                "metrics": metrics})
-                log.info("barrier_experiment.variant", symbol=symbol, horizon=horizon, tp=tp,
-                         **{key: metrics[key] for key in SUMMARY_KEYS})
-        report["symbols"][symbol] = results
+                datasets = {symbol: build_barrier_dataset(feats, variant)
+                            for symbol, feats in features.items()}
+                metrics_by_symbol = cv_evaluate_pooled(datasets, variant)
+                for symbol, metrics in metrics_by_symbol.items():
+                    report["symbols"].setdefault(symbol, []).append({
+                        "horizon_candles": horizon, "tp_atr_mult": tp, "metrics": metrics,
+                    })
+                    log.info("barrier_experiment.variant", symbol=symbol, horizon=horizon, tp=tp,
+                             **{key: metrics[key] for key in SUMMARY_KEYS})
+    else:
+        for symbol in cfg.symbols:
+            feats, _ = features_for_symbol(engine, symbol, cfg)
+            feats = feats.loc[feats.index < holdout_start]
+            results = []
+            for horizon in horizons:
+                for tp in tp_atr_mults:
+                    variant = cfg.model_copy(update={
+                        "labeling": cfg.labeling.model_copy(update={"horizon_candles": horizon}),
+                        "barrier": cfg.barrier.model_copy(update={"tp_atr_mult": tp}),
+                    })
+                    metrics = cv_evaluate_barrier(build_barrier_dataset(feats, variant), variant)
+                    results.append({"horizon_candles": horizon, "tp_atr_mult": tp,
+                                    "metrics": metrics})
+                    log.info("barrier_experiment.variant", symbol=symbol, horizon=horizon, tp=tp,
+                             **{key: metrics[key] for key in SUMMARY_KEYS})
+            report["symbols"][symbol] = results
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "report.json").write_text(json.dumps(report, indent=2, default=str))
     return report
